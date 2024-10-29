@@ -35,6 +35,7 @@ import HelpSupport from "../components/HelpSupport";
 import AllApplication from "../student/AllApplication";
 import StudentAgentInternal from './StudentAgentInternal';
 import CommonRoleProtected from "./CommonRoleProtected";
+import AgentRoleProtected from "./AgentRoleProtected";
 
 export const router = createBrowserRouter([
   {
@@ -85,9 +86,10 @@ export const router = createBrowserRouter([
   {
     path: "/agent-form/:page",
     element: (
-      <ProtectedAgent>
-        <AgentReg></AgentReg>
-      </ProtectedAgent>
+      <AgentRoleProtected>     
+      <AgentReg></AgentReg>
+      </AgentRoleProtected>
+      
     ),
   },
   {

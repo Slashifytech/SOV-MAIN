@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Loader from "../components/Loader";
-import { useSelector } from "react-redux";
 
-const ProtectedAgent = ({ children }) => {
+const AgentRoleProtected = ({ children }) => {
   const roleType = localStorage.getItem("role");
-  const { agentData } = useSelector((state) => state.agent);
 
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
+    const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
-  }, [loading]);
+  }, []);
 
   if (loading) {
     return (
@@ -22,11 +20,12 @@ const ProtectedAgent = ({ children }) => {
     );
   }
 
-  if (roleType !== "3" && agentData?.pageStatus?.status) {
+  // Only allow access if roleType is "2"
+  if (roleType !== "2") {
     return <Navigate to="/login" replace={true} />;
   }
 
   return children;
 };
 
-export default ProtectedAgent;
+export default AgentRoleProtected;
