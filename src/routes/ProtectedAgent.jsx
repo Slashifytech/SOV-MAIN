@@ -22,7 +22,7 @@ const ProtectedAgent = ({ children }) => {
     );
   }
 
-  if (roleType !== "3" && agentData?.pageStatus?.status) {
+  if (roleType !== "3" && agentData?.pageStatus?.status !== "completed") {
     return <Navigate to="/login" replace={true} />;
   }
 
