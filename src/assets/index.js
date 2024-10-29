@@ -1,6 +1,6 @@
 import logo from "./logo.png";
 import loginBanner from "./loginBanner.webp";
-import check from "./check.png";
+import check from "./check.webp";
 import icon1 from "./icon1.png";
 import icon2 from "./icon2.png";
 import icon3 from "./icon3.png";

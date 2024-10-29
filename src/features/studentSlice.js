@@ -50,6 +50,9 @@ const studentSlice = createSlice({
     setStudentOtp: (state, action) => {
       state.studentOtp = action.payload;
     },
+    clearStudentInformation: (state) => {
+      state.studentInformation = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -90,5 +93,5 @@ const studentSlice = createSlice({
   },
 });
 
-export const { setStudentOtp } = studentSlice.actions;
+export const { setStudentOtp, clearStudentInformation  } = studentSlice.actions;
 export default studentSlice.reducer;

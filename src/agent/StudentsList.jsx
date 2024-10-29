@@ -13,6 +13,7 @@ import Dnf from "../components/Dnf";
 import Loader from "../components/Loader";
 import { deleteStudentById } from "../features/agentApi";
 import { toast } from "react-toastify";
+import { clearStudentInformation } from "../features/studentSlice";
 
 const StudentsList = () => {
   const studentData = useSelector((state) => state.agent.totalStudents);
@@ -76,7 +77,7 @@ const StudentsList = () => {
   const locatStorageDelete = ()=>{
     localStorage.removeItem("form");
     localStorage.removeItem("student");
-
+    dispatch(clearStudentInformation())
   }
   return (
     <>

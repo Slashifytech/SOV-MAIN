@@ -185,7 +185,7 @@ const AgentSignUp = () => {
   };
   const handleVerify = async (otp) => {
     try {
-      const res = await verifyAgentEmail(agentRegister.founderOrCeo.email, otp);
+      const res = await verifyAgentEmail(agentRegister.founderOrCeo.email, otp, agentRegister.password);
       VerifyPopUpClose();
       // if(res.data.statusCode === 201){
       setTimeout(() => {

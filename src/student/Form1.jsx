@@ -312,6 +312,30 @@ const Form1 = ({
 
         if (res?.statusCode === 201 || res?.statusCode === 200) {
           toast.success("Personal Information Submitted successfully");
+          setPersonalData({
+            personalInformation: {
+              profilePicture: "",
+              title: "",
+              firstName: "",
+              lastName: "",
+              gender: "",
+              maritalStatus: "",
+              dob: "",
+              firstLanguage: "",
+              email: "",
+              phone: {
+                countryCode: "",
+                phone: "",
+              },
+            },
+            passportDetails: {
+              passportNumber: "",
+              expireDate: "",
+              passportUpload: [],
+              countryOfCitizenship: "",
+            },
+          });
+          setErrors({});
           {
             hide === true
               ? updateData()

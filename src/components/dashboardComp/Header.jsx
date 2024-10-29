@@ -20,7 +20,7 @@ const Header = ({ icon, customLink }) => {
       >
         {role !== "0" && (
           <span className="md:w-[85vw] sm:w-[60vw]">
-            <span className="flex justify-end flex-row gap-6">
+          <span className="flex justify-end flex-row gap-6 sm:w-[120%] md:w-full">
               <Link
                 to={customLink}
                 className="bg-white rounded-full px-[11px] py-2 text-[27px] cursor-pointer "
