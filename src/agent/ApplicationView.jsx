@@ -10,7 +10,7 @@ import { FaRegEye } from "react-icons/fa";
 import { studentById } from "./../features/generalSlice";
 import { CustomInput, SelectComponent } from "../components/reusable/Input";
 import { IoSearchOutline } from "react-icons/io5";
-import { applicationTypeOption } from "../constant/data";
+import { applicationTypeOption, statusOption } from "../constant/data";
 import Pagination from "../components/dashboardComp/Pagination";
 import Loader from "../components/Loader";
 import Dnf from "../components/Dnf";
@@ -49,7 +49,7 @@ const ApplicationView = () => {
   useEffect(() => {
     dispatch(studentById(studentId));
     dispatch(studentApplications({ search, isType, studentId, page, perPage }));
-  }, [dispatch, search, studentId, page, perPage]);
+  }, [dispatch, search, studentId, page, perPage, isType]);
 
   // Generate options for per page dropdown
   const perPageOptions = [];
@@ -108,8 +108,8 @@ const ApplicationView = () => {
             <div className="flex items-center gap-4 mt-1 ">
               <img
                 src={
-                  studentData?.studentInformation?.personalInformation?.profilePicture ||
-                  profileSkeleton
+                  studentData?.studentInformation?.personalInformation
+                    ?.profilePicture || profileSkeleton
                 }
                 alt="Profile"
                 className="rounded-md w-28 h-28"
@@ -121,15 +121,19 @@ const ApplicationView = () => {
                   {totalUsersCount || "NA"} Applications
                 </span>
                 <span className="text-sidebar text-[18px] font-medium ">
-                  {studentData?.studentInformation?.personalInformation?.firstName +
+                  {studentData?.studentInformation?.personalInformation
+                    ?.firstName +
                     " " +
-                    studentData?.studentInformation?.personalInformation?.lastName || "NA"}
+                    studentData?.studentInformation?.personalInformation
+                      ?.lastName || "NA"}
                 </span>
                 <span className="text-[14px] pt-[1px] text-body font-normal">
-                  {studentData?.studentInformation?.personalInformation?.email || "NA"}
+                  {studentData?.studentInformation?.personalInformation
+                    ?.email || "NA"}
                 </span>
                 <span className="text-[14px] text-body font-normal">
-                  {studentData?.studentInformation?.personalInformation?.phone?.phone || "NA"}
+                  {studentData?.studentInformation?.personalInformation?.phone
+                    ?.phone || "NA"}
                 </span>
                 <span className="text-[14px] text-body font-normal">
                   ID: {studentData?.studentInformation?.stId || "NA"}
@@ -161,8 +165,8 @@ const ApplicationView = () => {
                   value={isType}
                   onChange={handleApplicatioTypeChange}
                 >
-                  <option value="">Application Type</option>
-                  {applicationTypeOption.map((option) => (
+                  <option value="">Status</option>
+                  {statusOption.map((option) => (
                     <option key={option.option} value={option.option}>
                       {option.label}
                     </option>
@@ -197,7 +201,8 @@ const ApplicationView = () => {
         <div className="w-1 ml-[53%] mt-12">
           <Loader />
         </div>
-      ) :  studentApplicationData?.applications && studentApplicationData?.applications?.length > 0 ? (
+      ) : studentApplicationData?.applications &&
+        studentApplicationData?.applications?.length > 0 ? (
         <>
           <div className="md:ml-[19.5%] sm:ml-[27%]  mt-6 mr-6">
             <CustomTableTwo
@@ -211,13 +216,13 @@ const ApplicationView = () => {
             />
           </div>
           <div className="mt-16 mb-10 ml-20">
-          <Pagination
-                currentPage={currentPage}
-                hasNextPage={currentPage * perPage < totalUsersCount}
-                hasPreviousPage={currentPage > 1}
-                onPageChange={handlePageChange}
-                totalPagesCount={totalPagesCount}
-              />
+            <Pagination
+              currentPage={currentPage}
+              hasNextPage={currentPage * perPage < totalUsersCount}
+              hasPreviousPage={currentPage > 1}
+              onPageChange={handlePageChange}
+              totalPagesCount={totalPagesCount}
+            />
           </div>
         </>
       ) : (

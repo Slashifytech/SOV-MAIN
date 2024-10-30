@@ -308,7 +308,7 @@ export function CustomTableThree({
                 <Typography
                   variant="small"
                   color="blue-gray"
-                  className={`font-light text-[13px] text-white rounded-xl w-24 py-[3px] text-center ${
+                  className={`font-light text-[13px] text-white rounded-xl px-2 w-24 py-[3px] text-center ${
                     row.status === "underreview"
                       ? "bg-[#096D98] "
                       : row.status === "approved"

@@ -93,12 +93,13 @@ export const applictionOverview = createAsyncThunk(
 export const studentApplications = createAsyncThunk(
   "agents/studentApplications",
   async (
-    { search, applicationType, studentId, page, perPage },
+    { search,isType, applicationType, studentId, page, perPage },
     { rejectWithValue }
   ) => {
     try {
       const response = await getStudentApplication(
         search,
+        isType,
         applicationType,
         studentId,
         page,

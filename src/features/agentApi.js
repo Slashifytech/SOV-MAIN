@@ -331,6 +331,7 @@ export const getApplicationOverview = async (search, page, limit) => {
 };
 export const getStudentApplication = async (
   search,
+  isType,
   applicationType,
   studentId,
   page,
@@ -345,6 +346,7 @@ export const getStudentApplication = async (
           applicationType: applicationType,
           page: page,
           limit: perPage,
+          status: isType
         },
       }
     );

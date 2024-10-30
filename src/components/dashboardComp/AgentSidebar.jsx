@@ -56,7 +56,7 @@ const AgentSidebar = () => {
       label: "Applications",
       otherPath: "/agent/application/lists",
       otherPathTwo: "/offerLetter/edit",
-      otherPathThree: "/offerLetter-apply",
+      otherPathThree: "/offerletter-apply",
     },
   
   ];
