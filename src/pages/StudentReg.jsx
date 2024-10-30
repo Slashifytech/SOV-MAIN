@@ -29,7 +29,7 @@ const StudentReg = () => {
   const role = localStorage.getItem("role");
   const location = useLocation();
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
-
+console.log(location)
   const openLogoutPopup = () => {
     setisLogoutOpen(true);
   };
@@ -40,7 +40,7 @@ const StudentReg = () => {
   console.log(location);
   useEffect(() => {
     if (!page || isNaN(page) || page < 1 || page > formArray.length) {
-      navigate(`/student-form/1`);
+      navigate(`/student-form/1`,{ state: "passPage" });
     }
     dispatch(getStudentData(studentId));
   }, [page, navigate, formArray.length, dispatch]);
@@ -157,8 +157,8 @@ const StudentReg = () => {
 
           {/* Form Content */}
           <Suspense fallback={<div>Loading...</div>}>
-            {(page === "1" && (location.state === "passPage" ||
-            location.state.passPage === "passPage")) ? (
+            {(page === "1" && (location?.state === "passPage" ||
+            location?.state?.passPage === "passPage")) ? (
               <Form1
                 page={page}
                 hide={false}
@@ -171,8 +171,8 @@ const StudentReg = () => {
             ) : (
               page === "1" && <MissingPage />
             )}
-            {(page === "2" && (location.state === "passPage" ||
-            location.state.passPage === "passPage")) ? (
+            {(page === "2" && (location?.state === "passPage" ||
+            location?.state?.passPage === "passPage")) ? (
               <Form2
                 hide={false}
                 page={page}
@@ -185,8 +185,8 @@ const StudentReg = () => {
             ) : (
               page === "2" && <MissingPage />
             )}
-            {(page === "3" && (location.state === "passPage" ||
-            location.state.passPage === "passPage")) ? (
+            {(page === "3" && (location?.state === "passPage" ||
+            location?.state?.passPage === "passPage")) ? (
               <Form3
                 page={page}
                 hide={false}

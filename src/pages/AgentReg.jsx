@@ -49,7 +49,7 @@ const AgentReg = () => {
   // Ensure 'page' is an integer and falls within the correct range
   useEffect(() => {
     if (!page || isNaN(page) || page < 1 || page > formArray.length) {
-      navigate(`/agent-form/1`);
+      navigate(`/agent-form/1`, { state: "passPage" });
     }
   }, [page, navigate, formArray.length]);
 
