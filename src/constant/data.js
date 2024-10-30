@@ -117,7 +117,7 @@ export const licenceOption = [
 ];
 
 export const interestedProgramsOption = [
-  { id: 0, option: "diploma", label: "diploma" },
+  { id: 0, option: "diploma", label: "Diploma" },
   {
     id: 1,
     option: "englishLanguagePreprations",
@@ -188,6 +188,11 @@ export const applicationTypeOption = [
   { id: 0, option: "offerLetter", label: "Offer Letter" },
   { id: 1, option: "courseFeeApplication", label: "Course Fee Application" },
   { id: 2, option: "visa", label: "Visa" },
+];
+export const statusOption = [
+  { id: 0, option: "underreview", label: "Under Review" },
+  { id: 1, option: "approved", label: "Approved" },
+  { id: 2, option: "rejected", label: "Rejected" },
 ];
 export const intakeOption = [
   { id: 0, option: "Jan 2025", label: "Jan 2025" },

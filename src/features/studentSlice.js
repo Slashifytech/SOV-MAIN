@@ -42,7 +42,7 @@ const studentSlice = createSlice({
     studentInformation: [],
     studentInfoData: [],
     studentOtp: null,
-    applicationData: null,
+    applicationData: [],
     status: "idle",
     error: null,
   },
@@ -52,6 +52,9 @@ const studentSlice = createSlice({
     },
     clearStudentInformation: (state) => {
       state.studentInformation = [];
+    },
+    clearApplicationData: (state) => {
+      state.applicationData = [];
     },
   },
   extraReducers: (builder) => {
@@ -93,5 +96,5 @@ const studentSlice = createSlice({
   },
 });
 
-export const { setStudentOtp, clearStudentInformation  } = studentSlice.actions;
+export const { setStudentOtp,clearStudentInformation, clearApplicationData } = studentSlice.actions;
 export default studentSlice.reducer;

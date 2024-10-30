@@ -8,12 +8,12 @@ import { FaRegEye } from "react-icons/fa";
 import { studentById } from "./../features/generalSlice";
 import { CustomInput } from "../components/reusable/Input";
 import { IoSearchOutline } from "react-icons/io5";
-import { applicationTypeOption } from "../constant/data";
+import { applicationTypeOption, statusOption } from "../constant/data";
 import Pagination from "../components/dashboardComp/Pagination";
 import Loader from "../components/Loader";
 import Dnf from "../components/Dnf";
 import Sidebar from "../components/dashboardComp/Sidebar";
-import { getApplications } from "../features/studentSlice";
+import { clearApplicationData, getApplications } from "../features/studentSlice";
 
 const AllApplication = () => {
   const [search, setSearch] = useState("");
@@ -35,6 +35,7 @@ const AllApplication = () => {
     setPage(1);
   };
   const handleApplicatioTypeChange = (e) => {
+    dispatch(clearApplicationData())
     setIsType(e.target.value);
     setPage(1);
   };
@@ -127,7 +128,7 @@ const AllApplication = () => {
               </span>
             </span>
 
-            <div className="md:ml-[19.5%] sm:ml-[27%] mt-6 mr-6">
+            <div className="md:ml-[19.5%] sm:ml-[26%] mt-6 md:mr-6 sm:mr-2">
               <span className="flex flex-row items-center mb-3">
                 <span className="flex flex-row justify-between w-full items-center">
                   <span className="flex flex-row items-center ">
@@ -143,22 +144,22 @@ const AllApplication = () => {
                         </option>
                       ))}
                     </select>
-                    <span className="px-3 text-body">entries</span>
+                    <span className="md:px-3 sm:px-1 text-body">entries</span>
                     <select
-                      className="ml-3 border px-2 py-1 w-40 h-11 rounded outline-none"
+                      className="ml-3 border px-2 py-1 md:w-40 sm:w-24 h-11 rounded outline-none"
                       value={isType}
                       onChange={handleApplicatioTypeChange}
                     >
-                      <option value="">Application Type</option>
-                      {applicationTypeOption.map((option) => (
+                      <option value="">Status</option>
+                      {statusOption.map((option) => (
                         <option key={option.option} value={option.option}>
                           {option.label}
                         </option>
                       ))}
                     </select>
-                    <span className="flex flex-row items-center ml-9">
+                    <span className="flex flex-row items-center md:ml-9 sm:ml-3">
                       <CustomInput
-                        className="h-11 w-80 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
+                        className="h-11 md:w-80 sm:w-44  rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
                         type="text"
                         placeHodler="Search by application ID"
                         name="search"
@@ -173,7 +174,7 @@ const AllApplication = () => {
                   <Link
                     to="/offerletter-apply"
                     state={studentInfoData?.data?.studentInformation?._id}
-                    className="bg-primary text-white px-4 rounded-md py-2"
+                    className="bg-primary text-white md:px-4 sm:px-2 rounded-md py-2"
                   >
                     + Add Application
                   </Link>

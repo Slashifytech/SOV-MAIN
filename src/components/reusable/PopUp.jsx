@@ -58,11 +58,12 @@ const PopUp = ({
                 }}
                 className="px-8 py-2 cursor-pointer rounded-lg text-white bg-primary"
               >
-                {(heading === "Offer Letter Form Submitted" && role === "2") ||
-                (heading === "Offer Letter Form Submitted" && role === "3") 
-                  ? "Back to Applications" : 
-                ( heading === "Successfully Registered" && role === "2")
-                ? "Back to Lists"
+                {heading === "Offer Letter Form Submitted" && role === "2"
+                  ? "Back to Applications"
+                  : heading === "Offer Letter Form Submitted" && role === "3"
+                  ? "Back to Dashboard"
+                  : heading === "Successfully Registered" && role === "2"
+                  ? "Back to Lists"
                   : "Back to login"}
               </div>
             </div>
