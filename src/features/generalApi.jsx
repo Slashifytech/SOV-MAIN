@@ -108,6 +108,7 @@ export const OfferLetterEduInfoEdit = async (appId, offerLater, section) => {
       {
         ...offerLater,
         section,
+        resubmit: true,
       }
     );
 
