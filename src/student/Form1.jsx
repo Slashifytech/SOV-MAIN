@@ -304,38 +304,14 @@ const Form1 = ({
           passportUpload: personalData.passportDetails.passportUpload?.[0],
         },
       };
-
+console.log(hide)
       try {
-        const res = (hide || location?.state?.hide === true || studentInformation?.data?.studentInformation?.pageStatus?.status === "rejected") 
+        const res = (hide || location?.state?.hide === true || studentInformation?.data?.studentInformation?.pageStatus?.status === "rejected" || studentInformation?.data?.studentInformation?.pageStatus?.status === "registering" ) 
           ? await StudentPersnalInfoEdit(payload, studentId)
           : await StudentPersnalInfo(payload);
 
         if (res?.statusCode === 201 || res?.statusCode === 200) {
           toast.success("Personal Information Submitted successfully");
-          setPersonalData({
-            personalInformation: {
-              profilePicture: "",
-              title: "",
-              firstName: "",
-              lastName: "",
-              gender: "",
-              maritalStatus: "",
-              dob: "",
-              firstLanguage: "",
-              email: "",
-              phone: {
-                countryCode: "",
-                phone: "",
-              },
-            },
-            passportDetails: {
-              passportNumber: "",
-              expireDate: "",
-              passportUpload: [],
-              countryOfCitizenship: "",
-            },
-          });
-          setErrors({});
           {
             hide === true
               ? updateData()

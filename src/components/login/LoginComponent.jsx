@@ -124,12 +124,12 @@ const LoginComponent = () => {
           );  
           console.log(studentInfo)
 
+        
+          if (!studentInfo.data || Object.keys(studentInfo.data).length === 0) {
+            navigate("student-form/1", { state: "passPage" });
+            return;
+          }
           let redirectPath = "";
-          // if (!studentInfo.data || Object.keys(studentInfo.data).length === 0) {
-          //   navigate("student-form/1", { state: "passPage" });
-          //   return;
-          // }
-          
 
           if (
             studentInfo?.data?.studentInformation?.pageCount === 3 &&
@@ -146,7 +146,7 @@ const LoginComponent = () => {
             studentInfo?.data?.studentInformation?.pageCount !== 3 &&
             studentInfo?.data?.studentInformation?.pageStatus?.status === "registering"
           ) {
-            redirectPath = `/student-form/${studentInfo.data.pageCount}`;}
+            redirectPath = `/student-form/${studentInfo?.data?.studentInformation?.pageCount}`;}
             if (
               studentInfo?.data?.studentInformation?.pageCount === 3 &&
               studentInfo?.data?.studentInformation?.pageStatus?.status === "rejected"
