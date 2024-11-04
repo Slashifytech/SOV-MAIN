@@ -88,16 +88,17 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
         setOfferLater((prevData) => ({
           ...prevData,
           certificate: {
-            url: [...(prevData.certificate.url || []), ...uploadedUrls],
+            url: prevData.certificate.url.filter((url) => url !== fileUrl), // Remove the deleted file URL
           },
         }));
-        setResetUpload(true);
       }
     } catch (error) {
       toast.error("Error deleting file. Please try again.");
+      console.log(error);
     }
   };
 
+  
   useEffect(() => {
     if (applicationDataById) {
       setOfferLater({
