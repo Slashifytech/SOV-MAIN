@@ -65,7 +65,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
             <span className="font-light">Profile Picture</span>
             <a
               className="flex items-center gap-3 text-primary font-medium"
-              href={`https://${data?.personalInformation?.profilePicture}`}
+              href={data?.personalInformation?.profilePicture}
               target="_blank"
               rel="noopener noreferrer"
             >
