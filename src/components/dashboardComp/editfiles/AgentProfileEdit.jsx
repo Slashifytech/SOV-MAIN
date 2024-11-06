@@ -45,7 +45,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
             <span className="text-[24px]">
               <BsFillBuildingsFill />
             </span>
-            <span className="font-semibold text-[22px]">Comapny Details</span>
+            <span className="font-semibold text-[22px]">Company Details</span>
           </span>
           {profileView === "/admin/approvals" ||
           profileView === "/admin/applications-review"
