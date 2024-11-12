@@ -84,7 +84,7 @@ const Institution = () => {
 
     const updatedInstitutes = filtered.map((institute) => {
       const isShortlisted = shortlistedUniversities?.some(
-        (item) => item.instituteId._id === institute._id
+        (item) => item.instituteId?._id === institute?._id
       );
       return {
         ...institute,

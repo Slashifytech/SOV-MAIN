@@ -40,27 +40,24 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
   }, [dispatch]);
   const validateFields = () => {
     const newErrors = {};
-    if (!bankData.bankName) newErrors.bankName = "Bank Name is required";
-    if (!bankData.branchName) newErrors.branchName = "Branch Name is required";
-    if (!bankData.country) newErrors.country = "Country is required";
-    if (!bankData.provinceState)
-      newErrors.provinceState = "State/Province is required";
-    if (!bankData.address) newErrors.address = "Address is required";
-    if (!bankData.city) newErrors.city = "City is required";
-    if (!bankData.postalCode)
-      newErrors.postalCode = "Zip/Postal Code is required";
-    if (!bankData.swiftBicCode)
-      newErrors.swiftBicCode = "Swift/BIC Code is required";
-    if (!bankData.sortCode) newErrors.sortCode = "Sort Code is required";
-    if (!bankData.bankAccountName)
-      newErrors.bankAccountName = "Bank Account Name is required";
-    if (!bankData.bankAccountNumber)
-      newErrors.bankAccountNumber = "Bank Account Number is required";
-    if (!bankData.iban) newErrors.iban = "IBAN is required";
-
+  
+    if (bankData.bankName && !bankData.bankName) newErrors.bankName = "Bank Name is required";
+    if (bankData.branchName && !bankData.branchName) newErrors.branchName = "Branch Name is required";
+    if (bankData.country && !bankData.country) newErrors.country = "Country is required";
+    if (bankData.provinceState && !bankData.provinceState) newErrors.provinceState = "State/Province is required";
+    if (bankData.address && !bankData.address) newErrors.address = "Address is required";
+    if (bankData.city && !bankData.city) newErrors.city = "City is required";
+    if (bankData.postalCode && !bankData.postalCode) newErrors.postalCode = "Zip/Postal Code is required";
+    if (bankData.swiftBicCode && !bankData.swiftBicCode) newErrors.swiftBicCode = "Swift/BIC Code is required";
+    if (bankData.sortCode && !bankData.sortCode) newErrors.sortCode = "Sort Code is required";
+    if (bankData.bankAccountName && !bankData.bankAccountName) newErrors.bankAccountName = "Bank Account Name is required";
+    if (bankData.bankAccountNumber && !bankData.bankAccountNumber) newErrors.bankAccountNumber = "Bank Account Number is required";
+    if (bankData.iban && !bankData.iban) newErrors.iban = "IBAN is required";
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -80,18 +77,24 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
   // Handle form submission
   const handleSubmit = async () => {
     if (validateFields()) {
+      // Filter out empty fields
+      const filteredBankData = Object.fromEntries(
+        Object.entries(bankData).filter(([_, value]) => value !== "")
+      );
+  
       try {
-        const res = await formThreeSubmit(bankData, editForm);
-      
+        const res = await formThreeSubmit(filteredBankData, editForm);
+  
         toast.success(res?.message || "Data added successfully");
-        {hide === true ?   updateData() : 
-        navigate("/agent-form/4", { state: "passPage" })}
+  
+        hide === true ? updateData() : navigate("/agent-form/4", { state: "passPage" });
       } catch (error) {
         console.log(error);
         toast.error(error?.message || "Something went wrong");
       }
     }
   };
+  
 
   return (
     <div className="min-h-screen font-poppins">
@@ -108,7 +111,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
           <div className="flex items-center justify-between gap-6 w-full">
             <span className="w-[50%]">
               <Register
-                imp="*"
+            
                 name="bankName"
                 type="text"
                 label="Bank Name"
@@ -117,6 +120,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.bankName}
               />
               <CountrySelect
+              notImp={true}
                 name="country"
                 label="Country"
                 customClass="bg-input"
@@ -133,7 +137,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
             </span>
             <span className="w-[50%]">
               <Register
-                imp="*"
+         
                 name="branchName"
                 type="text"
                 label="Branch Name"
@@ -142,7 +146,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.branchName}
               />
               <Register
-                imp="*"
+    
                 name="provinceState"
                 type="text"
                 label="Province/State"
@@ -154,7 +158,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
           </div>
 
           <Register
-            imp="*"
+     
             name="address"
             type="text"
             label="Address"
@@ -167,7 +171,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
           <div className="flex items-center justify-between gap-6 w-full">
             <span className="w-[50%]">
               <Register
-                imp="*"
+              
                 name="city"
                 type="text"
                 label="City"
@@ -176,7 +180,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.city}
               />
               <Register
-                imp="*"
+            
                 name="swiftBicCode"
                 type="text"
                 label="Swift/BIC Code"
@@ -185,7 +189,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.swiftBicCode}
               />
               <Register
-                imp="*"
+            
                 name="bankAccountName"
                 type="text"
                 label="Bank Account Name"
@@ -194,7 +198,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.bankAccountName}
               />
               <Register
-                imp="*"
+          
                 name="iban"
                 type="text"
                 label="IBAN"
@@ -205,7 +209,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
             </span>
             <span className="w-[50%]">
               <Register
-                imp="*"
+            
                 name="postalCode"
                 type="number"
                 label="Zip/Postal Code"
@@ -214,7 +218,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.postalCode}
               />
               <Register
-                imp="*"
+          
                 name="sortCode"
                 type="text"
                 label="Sort Code/BSB Number"
@@ -223,7 +227,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
                 errors={errors.sortCode}
               />
               <Register
-                imp="*"
+             
                 name="bankAccountNumber"
                 type="text"
                 label="Bank Account Number"
