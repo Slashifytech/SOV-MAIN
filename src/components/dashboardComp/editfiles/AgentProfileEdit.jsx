@@ -382,7 +382,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Branch Name</span>
             <span className="font-medium">
-              {agentData?.bankDetails?.address || "NA"}
+            {agentData?.bankDetails?.branchName || "NA"}
             </span>
             <span className="font-light mt-4">City</span>
             <span className="font-medium">
