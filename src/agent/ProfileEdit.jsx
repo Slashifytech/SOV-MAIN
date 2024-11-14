@@ -85,7 +85,7 @@ const ProfileEdit = () => {
             <div className="flex items-center gap-4 mt-1 mb-6">
               <img
                 src={
-                  agentProfileData?.companyDetails?.profilePicture ||
+                  agentProfileData?.primaryContact?.profilePicture ||
                   profileSkeleton
                 }
                 alt="Profile"
