@@ -85,7 +85,7 @@ const ProfileEdit = () => {
             <div className="flex items-center gap-4 mt-1 mb-6">
               <img
                 src={
-                  agentProfileData?.primaryContact?.profilePicture ||
+                  agentProfileData?.companyDetails?.profilePicture ||
                   profileSkeleton
                 }
                 alt="Profile"
@@ -95,15 +95,13 @@ const ProfileEdit = () => {
               />
               <span className="flex flex-col">
                 <span className="text-sidebar text-[18px] font-medium ">
-                  {agentProfileData?.primaryContact?.firstName +
-                    " " +
-                    agentProfileData?.primaryContact?.lastName || "NA"}
+                  {agentProfileData?.companyDetails?.businessName  || "NA"}
                 </span>
                 <span className="text-[14px] pt-[1px] text-body font-normal">
                   {agentProfileData?.agentEmail || "NA"}
                 </span>
                 <span className="text-[14px] text-body font-normal">
-                  {agentProfileData?.agentPhone || "NA"}
+                  {agentProfileData?.companyDetails?.phoneNumber || "NA"}
                 </span>
                 <span className="text-[14px] text-body font-normal">
                   ID: {agentProfileData?.agId || "NA"}

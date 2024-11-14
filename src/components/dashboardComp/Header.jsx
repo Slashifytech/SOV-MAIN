@@ -58,9 +58,7 @@ const Header = ({ icon, customLink }) => {
                 <span className="flex flex-col">
                   <span className="font-normal text-[14px]">
                     {role === "2"
-                      ? agentData?.primaryContact?.firstName +
-                        " " +
-                        agentData?.primaryContact?.lastName
+                      ? agentData?.companyDetails?.businessName  
                       : role === "3"
                       ? studentInfoData?.data?.studentInformation
                           ?.personalInformation?.firstName +
