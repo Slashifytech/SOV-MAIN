@@ -94,9 +94,9 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
     if (!offerLater.preferences.intake?.trim()) {
       errors.prefIntake = "Preferred intake is required.";
     }
-    if (!offerLater.preferences.offerLetterPrice?.trim()) {
-      errors.prefOfferLetter = "Preferred offer letter price is required.";
-    }
+    // if (!offerLater.preferences.offerLetterPrice?.trim()) {
+    //   errors.prefOfferLetter = "Preferred offer letter price is required.";
+    // }
 
     return errors; // Always return an object
   };
@@ -109,8 +109,8 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
           intake: applicationDataById?.preferences?.intake || "",
           institution: applicationDataById?.preferences?.institution || "",
           country: applicationDataById?.preferences?.country || "",
-          offerLetterPrice:
-            applicationDataById?.preferences?.offerLetterPrice || "",
+          // offerLetterPrice:
+          //   applicationDataById?.preferences?.offerLetterPrice || "",
         },
       });
     }
@@ -178,10 +178,10 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
           <span className="font-medium">
             {applicationDataById?.preferences?.institution || "NA"}
           </span>
-          <span className="font-light mt-4">Offer Letter Price</span>
+          {/* <span className="font-light mt-4">Offer Letter Price</span>
           <span className="font-medium">
             {applicationDataById?.preferences?.offerLetterPrice || "NA"}
-          </span>
+          </span> */}
         </span>
       </div>
       <div
@@ -229,7 +229,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
             {errors.prefCourse && (
               <p className="text-red-500 mt-1 text-sm">{errors.prefCourse}</p>
             )}
-
+{/* 
             <Register
               imp="*"
               name="preferences.offerLetterPrice"
@@ -239,7 +239,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
 
               value={offerLater.preferences.offerLetterPrice}
               errors={errors.prefOfferLetter}
-            />
+            /> */}
 
             <SelectComponent
               name="preferences.intake"
