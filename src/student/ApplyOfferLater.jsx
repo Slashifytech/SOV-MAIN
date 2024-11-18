@@ -270,9 +270,9 @@ const ApplyOfferLater = () => {
     if (!offerLater.preferences.intake?.trim()) {
       errors.prefIntake = "Preferred intake is required.";
     }
-    if (!offerLater.preferences.offerLetterPrice?.trim()) {
-      errors.prefOfferLetter = "Preferred offer Letter is required.";
-    }
+    // if (!offerLater.preferences.offerLetterPrice?.trim()) {
+    //   errors.prefOfferLetter = "Preferred offer Letter is required.";
+    // }
 
     const isTOEFLFilled = Object.values(offerLater.TOEFL).some(
       (val) => val.trim() !== ""
@@ -725,7 +725,7 @@ const ApplyOfferLater = () => {
             {errors.prefCourse && (
               <p className="text-red-500 mt-1 text-sm">{errors.prefCourse}</p>
             )}
-            <Register
+            {/* <Register
               imp="*"
               name="preferences.offerLetterPrice"
               type="number"
@@ -733,7 +733,7 @@ const ApplyOfferLater = () => {
               handleInput={handleInput}
               value={offerLater.preferences.offerLetterPrice}
               errors={errors.prefOfferLetter}
-            />
+            /> */}
 
             <SelectComponent
               name="preferences.intake"
