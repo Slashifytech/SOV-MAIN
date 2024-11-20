@@ -99,7 +99,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       prevState.filter((file) => !fileUrl.includes(file.name))
     );
   
-    toast.info("File has been marked for deletion.");
+    // toast.info("File has been marked for deletion.");
   };
   
   
@@ -122,7 +122,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
           await deleteObject(storageRef);
           toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
-          toast.error(`Error deleting file: ${fileUrl}`);
+          // toast.error(`Error deleting file: ${fileUrl}`);
         }
       }
   
