@@ -79,7 +79,8 @@ const Form1 = ({
       countryOfCitizenship: "",
     },
   });
-
+  const [newFiles, setNewFiles] = useState([]); 
+  const [deletedFiles, setDeletedFiles] = useState([]);
   const [errors, setErrors] = useState({});
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -175,96 +176,76 @@ const Form1 = ({
     }));
   };
 
-  const handleFileUpload = async (files, uploadType) => {
-    if (!files || files.length === 0) return; // Ensure there are files to upload
-
-    let uploadedUrls = []; // Array to store uploaded file URLs
-
-    for (const file of files) {
-      console.log(file, "Uploading file");
-
-      const storageRef = ref(storage, `uploads/${file.name}`); // Upload with the file name
-
-      try {
-        // Upload each file
-        const snapshot = await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref); // Get the download URL
-        uploadedUrls.push(downloadURL); // Add the download URL to the array
-
-        toast.success(`${file.name} uploaded successfully!`);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        toast.error(`Error uploading ${file.name}. Please try again.`);
-      }
+  const handleFileUpload = (files, uploadType) => {
+    if (!files || files.length === 0) return;
+  
+    const uniqueFiles = files.filter(
+      (file) =>
+        !newFiles.some((existingFile) => existingFile.name === file.name) &&
+        !personalData.passportDetails.passportUpload.includes(file.name) &&
+        (uploadType !== "profilePicture" || file.name !== personalData.personalInformation.profilePicture)
+    );
+  
+    if (uniqueFiles.length === 0) {
+      toast.warn("Duplicate or previously deleted files are not allowed.");
+      return;
     }
-
-    // Update state based on upload type (profilePicture or passportUpload)
-    if (uploadType === "profilePicture" && uploadedUrls.length > 0) {
+  
+    setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
+  
+    if (uploadType === "profilePicture") {
       setPersonalData((prevData) => ({
         ...prevData,
         personalInformation: {
           ...prevData.personalInformation,
-          profilePicture: uploadedUrls[0], // Assuming a single profile picture is uploaded
+          profilePicture: "", // Reset until the file is uploaded
         },
       }));
-    } else if (uploadType === "passportUpload" && uploadedUrls.length > 0) {
-      setPersonalData((prevData) => {
-        // Debugging: Log the previous passportUpload and new uploadedUrls
-        // console.log("Previous passportUpload:", prevData.passportDetails.passportUpload || []);
-        // console.log("New URLs to be added:", uploadedUrls);
-
-        return {
-          ...prevData,
-          passportDetails: {
-            ...prevData.passportDetails,
-            passportUpload: [...uploadedUrls],
-          },
-        };
-      });
+    } else if (uploadType === "passportUpload") {
+      setPersonalData((prevData) => ({
+        ...prevData,
+        passportDetails: {
+          ...prevData.passportDetails,
+          passportUpload: [...prevData.passportDetails.passportUpload],
+        },
+      }));
     }
+  
+    toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
   };
-
+  
   //delete image and file from firebase
 
-  const deleteFile = async (fileUrl, uploadType) => {
+  const deleteFile = (fileUrl, uploadType) => {
     if (!fileUrl) return;
 
-    // Create a reference to the file to delete
-    const storageRef = ref(storage, fileUrl);
+    setDeletedFiles((prevState) => [...prevState, fileUrl]);
 
-    try {
-      // Delete the file
-      await deleteObject(storageRef);
-
-      toast.success("File deleted successfully!");
-
-      // Update the state based on the upload type (profilePicture or passportUpload)
-      if (uploadType === "profilePicture") {
-        setPersonalData((prevData) => ({
-          ...prevData,
-          personalInformation: {
-            ...prevData.personalInformation,
-            profilePicture: "", // Clear the profile picture after deletion
-          },
-        }));
-        setResetProfilePic(true); // Trigger reset
-      } else if (uploadType === "passportUpload") {
-        setPersonalData((prevData) => ({
-          ...prevData,
-          passportDetails: {
-            ...prevData.passportDetails,
-            passportUpload: prevData.passportDetails.passportUpload.filter(
-              (url) => url !== fileUrl
-            ), // Remove deleted file URL
-          },
-        }));
-        setResetPassportUpload(true); // Trigger reset
-      }
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      toast.error("Error deleting file. Please try again.");
+    if (uploadType === "profilePicture") {
+      setPersonalData((prevData) => ({
+        ...prevData,
+        personalInformation: {
+          ...prevData.personalInformation,
+          profilePicture: "",
+        },
+      }));
+    } else if (uploadType === "passportUpload") {
+      setPersonalData((prevData) => ({
+        ...prevData,
+        passportDetails: {
+          ...prevData.passportDetails,
+          passportUpload: prevData.passportDetails.passportUpload.filter((url) => url !== fileUrl),
+        },
+      }));
     }
+
+    setNewFiles((prevState) =>
+      prevState.filter((file) => !fileUrl.includes(file.name))
+    );
+
+    toast.info("File marked for deletion. Changes will be applied upon saving.");
   };
+
 
   useEffect(() => {
     if (personalInfo || passportInfo) {
@@ -281,7 +262,9 @@ const Form1 = ({
         passportDetails: {
           passportNumber: passportInfo?.passportNumber || "",
           expireDate: passportInfo?.expireDate || "",
-          passportUpload: [passportInfo?.passportUpload] || [],
+          passportUpload: passportInfo?.passportUpload
+          ? passportInfo.passportUpload.split(",") // Convert string to array
+          : [],
           countryOfCitizenship: passportInfo?.countryOfCitizenship || "",
         },
       }));
@@ -289,47 +272,107 @@ const Form1 = ({
   }, [personalInfo, passportInfo]);
 
   const handleSubmit = async () => {
-    if (validateFields()) {
+    const validationErrors = validateFields();
+  
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Form contains errors.");
+      return;
+    }
+  
+    try {
+      // Step 1: Handle deletions
+      for (const fileUrl of deletedFiles) {
+        const storageRef = ref(storage, fileUrl);
+        try {
+          await deleteObject(storageRef);
+          toast.success(`File ${fileUrl} deleted successfully.`);
+        } catch (error) {
+          toast.error(`Error deleting file: ${fileUrl}`);
+        }
+      }
+  
+      // Step 2: Upload new files
+      let profilePictureUrl = personalData.personalInformation.profilePicture;
+      const uploadedUrls = [];
+      for (const file of newFiles) {
+        const storageRef = ref(storage, `uploads/student/${file.name}`);
+        try {
+          const snapshot = await uploadBytes(storageRef, file);
+          const downloadURL = await getDownloadURL(snapshot.ref);
+  
+          if (file.type === "image/jpeg" || file.type === "image/png") {
+            profilePictureUrl = downloadURL; // Update profile picture URL
+          } else {
+            uploadedUrls.push(downloadURL); // Add to passport uploads
+          }
+  
+          if (file.type === "image/jpeg" || file.type === "image/png") {
+            // Update profile picture in the state
+            setPersonalData((prevData) => ({
+              ...prevData,
+              personalInformation: {
+                ...prevData.personalInformation,
+                profilePicture: downloadURL,
+              },
+            }));
+          } else {
+            // Update passport uploads in the state
+            setPersonalData((prevData) => ({
+              ...prevData,
+              passportDetails: {
+                ...prevData.passportDetails,
+                passportUpload: [...prevData.passportDetails.passportUpload, downloadURL],
+              },
+            }));
+          }
+  
+          toast.success(`${file.name} uploaded successfully.`);
+        } catch (error) {
+          toast.error(`Error uploading ${file.name}.`);
+        }
+      }
+      const passportUploadString = [
+        ...(personalData.passportDetails.passportUpload || []),
+        ...uploadedUrls,
+      ].join(",");
+      // Step 3: Prepare payload
       const payload = {
         personalInformation: {
           ...personalData.personalInformation,
-
+          profilePicture: profilePictureUrl, // Use the updated profile picture URL
           phone: {
             countryCode: personalData.personalInformation.phone.countryCode,
             phone: personalData.personalInformation.phone.phone,
           },
         },
-        passportDetails: {
+         passportDetails: {
           ...personalData.passportDetails,
-          passportUpload: personalData.passportDetails.passportUpload?.[0],
+          passportUpload: passportUploadString
         },
       };
-console.log(hide)
-      try {
-        const res = (hide || location?.state?.hide === true || studentInformation?.data?.studentInformation?.pageStatus?.status === "rejected" || studentInformation?.data?.studentInformation?.pageStatus?.status === "registering" ) 
-          ? await StudentPersnalInfoEdit(payload, studentId)
-          : await StudentPersnalInfo(payload);
-
-        if (res?.statusCode === 201 || res?.statusCode === 200) {
-          toast.success("Personal Information Submitted successfully");
-          {
-            hide === true
-              ? updateData()
-              : navigate(`/student-form/2`, { state: "passPage" });
-          }
-          window.scrollTo(0, 0);
-        } else {
-          toast.info(res?.message);
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error(error?.message || "Something went wrong");
+  
+      // Step 4: Submit the data
+      const res = (hide || location?.state?.hide === true || studentInformation?.data?.studentInformation?.pageStatus?.status === "rejected" || studentInformation?.data?.studentInformation?.pageStatus?.status === "registering")
+        ? await StudentPersnalInfoEdit(payload, studentId)
+        : await StudentPersnalInfo(payload);
+  
+      if (res?.statusCode === 201 || res?.statusCode === 200) {
+        toast.success("Personal Information Submitted successfully");
+        hide ? updateData() : navigate(`/student-form/2`, { state: "passPage" });
+  
+        // Clear temporary states
+        setNewFiles([]);
+        setDeletedFiles([]);
+      } else {
+        toast.info(res?.message);
       }
-    } else {
-      toast.error("Please fill in all required fields correctly.");
+    } catch (error) {
+      console.error("Error during submission:", error);
+      toast.error("Something went wrong.");
     }
   };
-
+  
   return (
     <div className="min-h-screen]">
       <div className={`${customClass}`}>
@@ -603,7 +646,7 @@ console.log(hide)
               className="bg-primary text-white px-6 py-2 rounded"
               onClick={() => {
                 handleSubmit();
-                handleCancel();
+              handleCancel();
               }}
             >
               Save

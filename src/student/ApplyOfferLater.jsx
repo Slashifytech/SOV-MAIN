@@ -247,16 +247,17 @@ const ApplyOfferLater = () => {
     if (!offerLater.educationDetails.educationLevel) {
       errors.educationLevel = "Education level is required.";
     }
-    // } else {
-    //   const requiredMarkSheets =
-    //     educationLevels[offerLater.educationDetails.educationLevel];
-    //   const uploadedMarkSheets = offerLater.educationDetails.markSheet;
 
-    //   if (requiredMarkSheets.length !== uploadedMarkSheets.length) {
-    //     errors.markSheet = `Please upload all required documents for ${offerLater.educationDetails.educationLevel}.`;
-    //   }
-    // }
+    if (!selectedEducation) {
+      errors.educationLevel = "Please select an education level.";
+    }
 
+    const requiredDocs = educationLevels[selectedEducation] || [];
+    requiredDocs.forEach((doc) => {
+      if (!offerLater.educationDetails[doc]) {
+        errors[doc] = `Please upload ${doc.replace("markSheet", "Marksheet")}.`;
+      }
+    });
     // Preferences validation
     if (!offerLater.preferences.country?.trim()) {
       errors.prefCountry = "Preferred country is required.";
@@ -684,6 +685,15 @@ const ApplyOfferLater = () => {
             )}
 
             {/* Error Display */}
+            {Object.keys(errors).length > 0 && (
+                <div className="mt-6">
+                  {Object.values(errors).map((error, index) => (
+                    <p key={index} className="text-red-500">
+                      {error}
+                    </p>
+                  ))}
+                </div>
+              )}
           </div>
           <div className="bg-white rounded-xl px-8 py-4 pb-12 mt-6">
             <span className="font-bold text-[25px] text-secondary ">
