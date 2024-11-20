@@ -200,18 +200,12 @@ const Form1 = ({
         ...prevData,
         personalInformation: {
           ...prevData.personalInformation,
-          profilePicture: blobUrls[0], // Set temporary blob URL
+          profilePicture: blobUrls[0], // Replace with the new blob URL
         },
       }));
     } else if (uploadType === "passportUpload") {
       setPersonalData((prevData) => {
-        // Ensure passportUpload is a string and concatenate the new blob URLs
-        const existingUrls = Array.isArray(prevData.passportDetails.passportUpload)
-          ? prevData.passportDetails.passportUpload.join(",") // Convert array to string
-          : prevData.passportDetails.passportUpload || ""; // Use empty string if undefined
-  
-        const updatedPassportUpload = [existingUrls, ...blobUrls].filter(Boolean).join(",");
-  
+        const updatedPassportUpload = blobUrls[0]; // Replace existing URL with the new blob URL
         return {
           ...prevData,
           passportDetails: {
@@ -221,8 +215,6 @@ const Form1 = ({
         };
       });
     }
-  
-    // toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
   };
   
   
@@ -230,34 +222,50 @@ const Form1 = ({
 
   const deleteFile = (fileUrl, uploadType) => {
     if (!fileUrl) return;
-
-    setDeletedFiles((prevState) => [...prevState, fileUrl]);
-
+  
+    const isFirebaseUrl = fileUrl.startsWith("http");
+  
+    setPersonalData((prevData) => {
+      const passportUpload = Array.isArray(prevData?.passportDetails?.passportUpload)
+        ? prevData.passportDetails.passportUpload
+        : prevData.passportDetails.passportUpload
+        ? prevData.passportDetails.passportUpload.split(",")
+        : [];
+  
+      if (!isFirebaseUrl) {
+        setResetPassportUpload(true);
+        return {
+          ...prevData,
+          passportDetails: {
+            ...prevData.passportDetails,
+            passportUpload: "", // Remove URL entirely
+          },
+        };
+      } else {
+        setDeletedFiles((prevState) => [...prevState, fileUrl]);
+        return {
+          ...prevData,
+          passportDetails: {
+            ...prevData.passportDetails,
+            passportUpload: "", // Remove URL entirely
+          },
+        };
+      }
+    });
+  
     if (uploadType === "profilePicture") {
       setPersonalData((prevData) => ({
         ...prevData,
         personalInformation: {
           ...prevData.personalInformation,
-          profilePicture: "",
-        },
-      }));
-    } else if (uploadType === "passportUpload") {
-      setPersonalData((prevData) => ({
-        ...prevData,
-        passportDetails: {
-          ...prevData.passportDetails,
-          passportUpload: prevData.passportDetails.passportUpload.filter((url) => url !== fileUrl),
+          profilePicture: "", // Remove profile picture
         },
       }));
     }
-
-    setNewFiles((prevState) =>
-      prevState.filter((file) => !fileUrl.includes(file.name))
-    );
-
-    // toast.info("File marked for deletion. Changes will be applied upon saving.");
+  
+    // toast.info("File has been marked for deletion.");
   };
-
+  
 
   useEffect(() => {
     if (personalInfo || passportInfo) {
@@ -293,20 +301,18 @@ const Form1 = ({
     }
   
     try {
-      // Step 1: Handle deletions
+      // Handle deletions
       for (const fileUrl of deletedFiles) {
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
-          // toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
-          // toast.error(`Error deleting file: ${fileUrl}`);
+          console.error(`Error deleting file: ${fileUrl}`);
         }
       }
   
-      // Step 2: Upload new files
       let profilePictureUrl = personalData.personalInformation.profilePicture;
-      const firebaseUrls = []; // Collect Firebase URLs
+      let firebaseUrl = "";
   
       for (const file of newFiles) {
         const storageRef = ref(storage, `uploads/student/${file.name}`);
@@ -316,23 +322,21 @@ const Form1 = ({
           const downloadURL = await getDownloadURL(snapshot.ref);
   
           if (file.type === "image/jpeg" || file.type === "image/png") {
-            profilePictureUrl = downloadURL; // Update profile picture URL
+            profilePictureUrl = downloadURL;
             setPersonalData((prevData) => ({
               ...prevData,
               personalInformation: {
                 ...prevData.personalInformation,
-                profilePicture: downloadURL, // Replace blob URL with Firebase URL
+                profilePicture: downloadURL,
               },
             }));
           } else {
-            firebaseUrls.push(downloadURL); // Add Firebase URLs
+            firebaseUrl = downloadURL; // Replace any existing URL
             setPersonalData((prevData) => ({
               ...prevData,
               passportDetails: {
                 ...prevData.passportDetails,
-                passportUpload: prevData.passportDetails.passportUpload.map((url) =>
-                  url.startsWith("blob:") ? downloadURL : url
-                ), // Replace blob URLs with Firebase URLs
+                passportUpload: firebaseUrl, // Replace blob URL with Firebase URL
               },
             }));
           }
@@ -340,9 +344,6 @@ const Form1 = ({
           toast.error(`Error uploading ${file.name}.`);
         }
       }
-  
-      // Step 3: Prepare payload
-      const passportUploadString = firebaseUrls.join(",");
       const payload = {
         personalInformation: {
           ...personalData.personalInformation,
@@ -354,7 +355,7 @@ const Form1 = ({
         },
         passportDetails: {
           ...personalData.passportDetails,
-          passportUpload: passportUploadString, // Save Firebase URLs as a string
+          passportUpload: firebaseUrl, // Save Firebase URLs as a string
         },
       };
   

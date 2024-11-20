@@ -63,6 +63,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
         <div className="flex flex-row w-full justify-between mt-6">
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">Profile Picture</span>
+          {  data?.personalInformation?.profilePicture ?
             <a
               className="flex items-center gap-3 text-primary font-medium"
               href={data?.personalInformation?.profilePicture}
@@ -73,7 +74,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
               <span>
                 <FaRegEye />
               </span>
-            </a>
+            </a> : "NA"}
             <span className="font-light mt-4">Gender</span>
             <span className="font-medium">
               {data?.personalInformation?.gender || "NA"}
@@ -125,6 +126,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
         <div className="flex flex-row w-full justify-between mt-6">
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">upload Passport </span>
+            {data?.personalInformation?.passportUpload ?
             <a
               className="flex items-center gap-3 text-primary font-medium"
               href={data?.passportDetails?.passportUpload}
@@ -135,7 +137,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
               <span>
                 <FaRegEye />
               </span>
-            </a>
+            </a> : "NA" }
             <span className="font-light mt-4">Passport Number</span>
             <span className="font-medium">
               {data?.passportDetails?.passportNumber || "NA"}

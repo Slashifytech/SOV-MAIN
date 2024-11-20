@@ -66,23 +66,27 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
   
     // Temporarily set blob URLs for preview
-    const previewUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
+    const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
     setOfferLater((prevData) => ({
       ...prevData,
       certificate: {
-        url: [...prevData.certificate.url, ...previewUrls],
+        url: [...prevData.certificate.url, ...blobUrls], // Append blob URLs
       },
     }));
-  
-    // toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
   };
   
   
   const deleteFile = (fileUrl) => {
     if (!fileUrl) return;
   
-    setDeletedFiles((prevState) => [...prevState, fileUrl]);
+    const isFirebaseUrl = fileUrl.startsWith("http");
   
+    if (isFirebaseUrl) {
+      // Add Firebase URL to deletedFiles for server-side deletion
+      setDeletedFiles((prevState) => [...prevState, fileUrl]);
+    }
+  
+    // Remove the URL from state (blob or Firebase)
     setOfferLater((prevData) => ({
       ...prevData,
       certificate: {
@@ -90,12 +94,14 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       },
     }));
   
+    // Remove blob URL from newFiles array
     setNewFiles((prevState) =>
       prevState.filter((file) => !fileUrl.includes(file.name))
     );
   
-    // toast.info("File marked for deletion. Changes will be applied upon saving.");
+    toast.info("File has been marked for deletion.");
   };
+  
   
   const handleSubmit = async () => {
     const validationErrors = validateFields();
@@ -114,6 +120,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
+          toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
           toast.error(`Error deleting file: ${fileUrl}`);
         }
@@ -128,19 +135,31 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
             uploadedUrls.push(downloadURL);
+  
+            // Replace blob URLs with Firebase URLs in state
+            setOfferLater((prevData) => ({
+              ...prevData,
+              certificate: {
+                url: prevData.certificate.url.map((url) =>
+                  url.startsWith("blob:") ? downloadURL : url
+                ),
+              },
+            }));
           } catch (error) {
             toast.error(`Error uploading ${file.name}.`);
           }
         }
-      } else {
-        toast.info("No new files to upload.");
       }
   
       // Step 3: Prepare updated URLs
-      const updatedUrls = uploadedUrls; // Only Firebase URLs
+      const updatedUrls = [
+        ...offerLater.certificate.url.filter((url) => !url.startsWith("blob:")), // Retain Firebase URLs
+        ...uploadedUrls, // Add newly uploaded Firebase URLs
+      ];
+  
       setOfferLater((prevData) => ({
         ...prevData,
-        certificate: { url: updatedUrls }, // Set only Firebase URLs
+        certificate: { url: updatedUrls },
       }));
   
       // Step 4: Prepare payload
@@ -158,7 +177,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       setIsSubmitting(false);
       handleCancelOne();
     } catch (error) {
-      console.error(error);
+      console.error("Error during submission:", error);
       toast.error("Something went wrong.");
     }
   };
@@ -167,7 +186,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     if (applicationDataById) {
       setOfferLater({
         certificate: {
-          url: applicationDataById?.certificate?.url || [],
+          url: applicationDataById?.offerLetter?.certificate?.url || [],
         },
       });
     }
@@ -200,22 +219,25 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">IELTS/PTE/TOEFL/Certificate*</span>
             <span className="font-medium mt-2">
-              {applicationDataById?.certificate?.url?.map((url, index) => (
-                
-                <a
-                  className="flex items-center gap-3 text-primary font-medium"
-                  href={
-                  url
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                      Uploaded Document {index + 1 || "NA"}
-                  <span>
-                    <FaRegEye />
-                  </span>
-                </a>
-              ))}
+            {applicationDataById?.offerLetter?.certificate?.url?.length > 0 ? (
+  applicationDataById.offerLetter.certificate.url.map((url, index) => (
+    <a
+      key={index} // Always add a key when mapping over an array
+      className="flex items-center gap-3 text-primary font-medium"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Uploaded Document {index + 1}
+      <span>
+        <FaRegEye />
+      </span>
+    </a>
+  ))
+) : (
+  <span>NA</span>
+)}
+
             </span>
           </span>
         </div>
@@ -237,39 +259,36 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
               <p>Upload Certificates</p>
             </div>
 
-            {Array.isArray(offerLater.certificate.url) &&
-              offerLater.certificate.url?.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-secondary font-semibold">
-                    Uploaded Documents:
-                  </p>
-                  <ul>
-                    {offerLater.certificate?.url
-                      .filter(
-                        (url) =>
-                          typeof url === "string" && url.startsWith("http")
-                      )
-                      .map((url, index) => (
-                        <li key={index} className="flex items-center mt-2">
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary rounded-sm px-6 py-2 border border-greyish"
-                          >
-                            Uploaded Document
-                          </a>
-                          <button
-                            onClick={() => deleteFile(url, "certificate")}
-                            className="ml-4 text-red-500 text-[21px]"
-                          >
-                            <RiDeleteBin6Line />
-                          </button>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
+            {Array.isArray(offerLater.certificate.url) && offerLater.certificate.url.length > 0 && (
+  <div className="mt-4">
+    <p className="text-secondary font-semibold">Uploaded Documents:</p>
+    <ul>
+      {offerLater.certificate.url
+        .filter(
+          (url) => typeof url === "string" && (url.startsWith("http") || url.startsWith("blob:")) // Include blob URLs
+        )
+        .map((url, index) => (
+          <li key={index} className="flex items-center mt-2">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary rounded-sm px-6 py-2 border border-greyish"
+            >
+              Uploaded Document
+            </a>
+            <button
+              onClick={() => deleteFile(url, "certificate")}
+              className="ml-4 text-red-500 text-[21px]"
+            >
+              <RiDeleteBin6Line />
+            </button>
+          </li>
+        ))}
+    </ul>
+  </div>
+)}
+
           </div>
 
           {isOne && (
