@@ -120,7 +120,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
-          toast.success(`File ${fileUrl} deleted successfully.`);
+          // toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
           // toast.error(`Error deleting file: ${fileUrl}`);
         }
