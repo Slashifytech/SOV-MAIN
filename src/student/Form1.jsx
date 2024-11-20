@@ -377,7 +377,7 @@ const Form1 = ({
       }
     } catch (error) {
       console.error("Error during submission:", error);
-      toast.error("Something went wrong.");
+      toast.error(error?.message || "Something went wrong.");
     }
   };
   
