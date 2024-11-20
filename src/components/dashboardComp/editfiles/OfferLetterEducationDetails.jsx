@@ -48,6 +48,7 @@ const OfferLetterEducationDetails = ({ appId, updatedData, profileViewPath }) =>
   const [offerLater, setOfferLater] = useState({
     educationDetails: { ...initialEducationDetails },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPopUp, setIsPopUp] = useState(false);
   const [selectedEducation, setSelectedEducation] = useState("");
   const [isFileType, seFileType] = useState();
@@ -155,6 +156,7 @@ const handleSubmit = async () => {
   }
 
   try {
+    setIsSubmitting(true);
     // Delete files marked for deletion
     for (const { fileUrl } of deletedFiles) {
       const storageRef = ref(storage, fileUrl);
@@ -203,11 +205,13 @@ const handleSubmit = async () => {
     const res = await OfferLetterEduInfoEdit(appId, updatedOfferLater, section);
     updatedData();
     toast.success(res.message || "Data added successfully.");
-    handleCancelOne();
+
 
     // Clear temporary states
     setDeletedFiles([]);
     setNewFiles([]);
+    setIsSubmitting(false);
+    handleCancelOne();
   } catch (error) {
     toast.error("Something went wrong.");
   }
@@ -470,7 +474,7 @@ console.log(applicationDataById)
                     className="bg-primary text-white px-6 py-2 rounded"
                     onClick={handleSubmit}
                   >
-                    Save
+                    {isSubmitting ? "Submitting..." : "Save"}
                   </button>
                 </div>
               )}

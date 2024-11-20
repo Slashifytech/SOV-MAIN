@@ -19,6 +19,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
   const [offerLater, setOfferLater] = useState({
     certificate: { url: [] },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPopUp, setIsPopUp] = useState(false);
   const [isFileType, seFileType] = useState();
   const [errors, setErrors] = useState({});
@@ -64,6 +65,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
   
     setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
   
+    // Temporarily set blob URLs for preview
     const previewUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
     setOfferLater((prevData) => ({
       ...prevData,
@@ -92,7 +94,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       prevState.filter((file) => !fileUrl.includes(file.name))
     );
   
-    toast.info("File marked for deletion. Changes will be applied upon saving.");
+    // toast.info("File marked for deletion. Changes will be applied upon saving.");
   };
   
   const handleSubmit = async () => {
@@ -105,12 +107,13 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     }
   
     try {
+      setIsSubmitting(true);
+  
       // Step 1: Delete files marked for deletion
       for (const fileUrl of deletedFiles) {
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
-          // toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
           toast.error(`Error deleting file: ${fileUrl}`);
         }
@@ -125,7 +128,6 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
             uploadedUrls.push(downloadURL);
-            // toast.success(`${file.name} uploaded successfully.`);
           } catch (error) {
             toast.error(`Error uploading ${file.name}.`);
           }
@@ -135,31 +137,28 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       }
   
       // Step 3: Prepare updated URLs
-      const existingUrls = offerLater.certificate.url.filter(
-        (url) => !deletedFiles.includes(url) // Exclude deleted files
-      );
-  
-      const updatedUrls = [...existingUrls, ...uploadedUrls];
-  
-      // Step 4: Update the state with new URLs
+      const updatedUrls = uploadedUrls; // Only Firebase URLs
       setOfferLater((prevData) => ({
         ...prevData,
-        certificate: { url: updatedUrls },
+        certificate: { url: updatedUrls }, // Set only Firebase URLs
       }));
   
-      // Step 5: Prepare payload
+      // Step 4: Prepare payload
       const payload = { certificates: updatedUrls };
       const section = "offerLetter";
   
       const res = await OfferLetterCertificate(appId, payload, section);
       toast.success("Data added successfully.");
+  
       updatedData();
   
-      // Step 6: Clear temporary states
+      // Step 5: Clear temporary states
       setDeletedFiles([]);
       setNewFiles([]);
+      setIsSubmitting(false);
+      handleCancelOne();
     } catch (error) {
-      console.log(error)
+      console.error(error);
       toast.error("Something went wrong.");
     }
   };
@@ -285,7 +284,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
                 className="bg-primary text-white px-6 py-2 rounded"
                 onClick={handleSubmit}
               >
-                Save
+                  {isSubmitting ? "Submitting..." : "Save"}
               </button>
             </div>
           )}

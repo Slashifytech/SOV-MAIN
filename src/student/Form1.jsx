@@ -55,7 +55,7 @@ const Form1 = ({
   const passportInfo =
     studentInformation?.data?.studentInformation?.passportDetails;
   const editForm = hide === true ? "edit" : null;
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [personalData, setPersonalData] = useState({
     personalInformation: {
       profilePicture: "",
@@ -211,7 +211,7 @@ const Form1 = ({
       }));
     }
   
-    toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
+    // toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
   };
   
   //delete image and file from firebase
@@ -243,7 +243,7 @@ const Form1 = ({
       prevState.filter((file) => !fileUrl.includes(file.name))
     );
 
-    toast.info("File marked for deletion. Changes will be applied upon saving.");
+    // toast.info("File marked for deletion. Changes will be applied upon saving.");
   };
 
 
@@ -298,6 +298,7 @@ const Form1 = ({
       for (const file of newFiles) {
         const storageRef = ref(storage, `uploads/student/${file.name}`);
         try {
+          setIsSubmitting(true);
           const snapshot = await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(snapshot.ref);
   
@@ -327,7 +328,7 @@ const Form1 = ({
             }));
           }
   
-          toast.success(`${file.name} uploaded successfully.`);
+          // toast.success(`${file.name} uploaded successfully.`);
         } catch (error) {
           toast.error(`Error uploading ${file.name}.`);
         }
@@ -364,6 +365,7 @@ const Form1 = ({
         // Clear temporary states
         setNewFiles([]);
         setDeletedFiles([]);
+        handleCancel();
       } else {
         toast.info(res?.message);
       }
@@ -646,10 +648,10 @@ const Form1 = ({
               className="bg-primary text-white px-6 py-2 rounded"
               onClick={() => {
                 handleSubmit();
-              handleCancel();
+             
               }}
             >
-              Save
+            {isSubmitting ? "Submitting..." : "Save"}
             </button>
           </div>
         ) : (
