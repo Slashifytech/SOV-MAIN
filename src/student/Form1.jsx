@@ -194,6 +194,7 @@ const Form1 = ({
     setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
   
     const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
+  
     if (uploadType === "profilePicture") {
       setPersonalData((prevData) => ({
         ...prevData,
@@ -203,21 +204,27 @@ const Form1 = ({
         },
       }));
     } else if (uploadType === "passportUpload") {
-      const updatedPassportUpload = [
-        ...(prevData.passportDetails.passportUpload ? prevData.passportDetails.passportUpload.split(",") : []),
-        ...blobUrls,
-      ].join(",");
-      setPersonalData((prevData) => ({
-        ...prevData,
-        passportDetails: {
-          ...prevData.passportDetails,
-          passportUpload: updatedPassportUpload,
-        },
-      }));
+      setPersonalData((prevData) => {
+        // Ensure passportUpload is a string and concatenate the new blob URLs
+        const existingUrls = Array.isArray(prevData.passportDetails.passportUpload)
+          ? prevData.passportDetails.passportUpload.join(",") // Convert array to string
+          : prevData.passportDetails.passportUpload || ""; // Use empty string if undefined
+  
+        const updatedPassportUpload = [existingUrls, ...blobUrls].filter(Boolean).join(",");
+  
+        return {
+          ...prevData,
+          passportDetails: {
+            ...prevData.passportDetails,
+            passportUpload: updatedPassportUpload, // Save as a single string
+          },
+        };
+      });
     }
   
     // toast.info(`${uniqueFiles.length} new files will be uploaded upon saving.`);
   };
+  
   
   //delete image and file from firebase
 
@@ -569,38 +576,36 @@ const Form1 = ({
           )}
 
           {/* Show uploaded documents */}
-          {Array.isArray(personalData.passportDetails.passportUpload) &&
-            personalData.passportDetails.passportUpload.length > 0 && (
-              <div className="mt-4">
-                <p className="text-secondary font-semibold">
-                  Uploaded Documents:
-                </p>
-                <ul>
-                  {personalData.passportDetails.passportUpload
-                    .filter(
-                      (url) => typeof url === "string" && url.startsWith("http")
-                    )
-                    .map((url, index) => (
-                      <li key={index} className="flex items-center mt-2">
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary rounded-sm px-6 py-2 border border-greyishtext-primary  "
-                        >
-                          Uploaded Passport
-                        </a>
-                        <button
-                          onClick={() => deleteFile(url, "passportUpload")}
-                          className="ml-4 text-red-500 test-[21px]"
-                        >
-                          <RiDeleteBin6Line />
-                        </button>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )}
+          {personalData.passportDetails.passportUpload && (
+  <div className="mt-4">
+    <p className="text-secondary font-semibold">Uploaded Documents:</p>
+    <ul>
+      {(Array.isArray(personalData.passportDetails.passportUpload)
+        ? personalData.passportDetails.passportUpload
+        : personalData.passportDetails.passportUpload.split(",") // Convert string to array
+      )
+        .filter((url) => typeof url === "string" && (url.startsWith("http") || url.startsWith("blob:"))) // Include blob URLs
+        .map((url, index) => (
+          <li key={index} className="flex items-center mt-2">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary rounded-sm px-6 py-2 border border-greyishtext-primary"
+            >
+              Uploaded Passport
+            </a>
+            <button
+              onClick={() => deleteFile(url, "passportUpload")}
+              className="ml-4 text-red-500 test-[21px]"
+            >
+              <RiDeleteBin6Line />
+            </button>
+          </li>
+        ))}
+    </ul>
+  </div>
+)}
 
           <CountrySelect
             name="passportDetails.countryOfCitizenship"
