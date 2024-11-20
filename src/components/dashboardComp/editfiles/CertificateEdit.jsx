@@ -167,7 +167,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     if (applicationDataById) {
       setOfferLater({
         certificate: {
-          url: applicationDataById?.offerLetter?.certificate?.url || [],
+          url: applicationDataById?.certificate?.url || [],
         },
       });
     }
@@ -200,7 +200,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">IELTS/PTE/TOEFL/Certificate*</span>
             <span className="font-medium mt-2">
-              {applicationDataById?.offerLetter?.certificate?.url?.map((url, index) => (
+              {applicationDataById?.certificate?.url?.map((url, index) => (
                 
                 <a
                   className="flex items-center gap-3 text-primary font-medium"

@@ -218,23 +218,23 @@ const handleSubmit = async () => {
 };
 
   useEffect(() => {
-    if (applicationDataById?.offerLetter?.educationDetails) {
+    if (applicationDataById?.educationDetails) {
       setOfferLater((prevState) => ({
         ...prevState,
         educationDetails: {
           educationLevel:
-            applicationDataById?.offerLetter.educationDetails.educationLevel || "",
-          markSheet10: applicationDataById?.offerLetter.educationDetails.markSheet10 || "",
-          markSheet12: applicationDataById?.offerLetter.educationDetails.markSheet12 || "",
+            applicationDataById?.educationDetails.educationLevel || "",
+          markSheet10: applicationDataById?.educationDetails.markSheet10 || "",
+          markSheet12: applicationDataById?.educationDetails.markSheet12 || "",
           markSheetUnderGraduate:
-            applicationDataById?.offerLetter.educationDetails.markSheetUnderGraduate || "",
+            applicationDataById?.educationDetails.markSheetUnderGraduate || "",
           markSheetPostGraduate:
-            applicationDataById?.offerLetter.educationDetails.markSheetPostGraduate || "",
+            applicationDataById?.educationDetails.markSheetPostGraduate || "",
         },
       }));
 
       setSelectedEducation(
-        applicationDataById?.offerLetter.educationDetails.educationLevel || ""
+        applicationDataById?.educationDetails.educationLevel || ""
       );
     }
   }, [applicationDataById]);
@@ -277,7 +277,7 @@ console.log(applicationDataById)
                 <span className="font-light">Level of Education</span>
                 <span className="font-medium ">
                   {educationLevelLabels[
-                    applicationDataById?.offerLetter?.educationDetails?.educationLevel
+                    applicationDataById?.educationDetails?.educationLevel
                   ] || "NA"}
                 </span>
               </span>
@@ -288,12 +288,12 @@ console.log(applicationDataById)
                 <a
                   className="flex items-center gap-3 text-primary font-medium"
                   href={
-                    applicationDataById?.offerLetter?.educationDetails?.markSheet10 || "#"
+                    applicationDataById?.educationDetails?.markSheet10 || "#"
                   }
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {applicationDataById?.offerLetter?.educationDetails?.markSheet10 &&
+                  {applicationDataById?.educationDetails?.markSheet10 &&
                      "Uploaded"
                     }
                   <span>
@@ -302,16 +302,16 @@ console.log(applicationDataById)
                 </a>
               </span>
 
-              {applicationDataById?.offerLetter?.educationDetails?.markSheet12 && (
+              {applicationDataById?.educationDetails?.markSheet12 && (
                 <>
                   <span className="font-light mt-4">12th Marksheet</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
-                    href={applicationDataById?.offerLetter?.educationDetails?.markSheet12}
+                    href={applicationDataById?.educationDetails?.markSheet12}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.offerLetter?.educationDetails?.markSheet12
+                    {applicationDataById?.educationDetails?.markSheet12
                       ? "Uploaded"
                       : "NA"}
                     <span>
@@ -322,20 +322,20 @@ console.log(applicationDataById)
               )}
             </span>
             <span className="w-1/2">
-              {applicationDataById?.offerLetter?.educationDetails
+              {applicationDataById?.educationDetails
                 ?.markSheetUnderGraduate && (
                 <>
                   <span className="font-light mt-4">Under Graduate</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
                     href={
-                      applicationDataById?.offerLetter?.educationDetails
+                      applicationDataById?.educationDetails
                         ?.markSheetUnderGraduate
                     }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.offerLetter?.educationDetails
+                    {applicationDataById?.educationDetails
                       ?.markSheetUnderGraduate
                       ? "Uploaded"
                       : "NA"}
@@ -346,19 +346,19 @@ console.log(applicationDataById)
                 </>
               )}
 
-              {applicationDataById?.offerLetter?.educationDetails?.markSheetPostGraduate && (
+              {applicationDataById?.educationDetails?.markSheetPostGraduate && (
                 <>
                   <span className="font-light mt-4">Post Graduate</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
                     href={
-                      applicationDataById?.offerLetter?.educationDetails
+                      applicationDataById?.educationDetails
                         ?.markSheetPostGraduate
                     }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.offerLetter?.educationDetails
+                    {applicationDataById?.educationDetails
                       ?.markSheetPostGraduate
                       ? "Uploaded"
                       : "NA"}
