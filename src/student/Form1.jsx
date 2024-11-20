@@ -365,7 +365,10 @@ const Form1 = ({
         // Clear temporary states
         setNewFiles([]);
         setDeletedFiles([]);
-        handleCancel();
+        {editForm &&
+         handleCancel()}
+       
+      
       } else {
         toast.info(res?.message);
       }
