@@ -182,7 +182,7 @@ const Form1 = ({
     const uniqueFiles = files.filter(
       (file) =>
         !newFiles.some((existingFile) => existingFile.name === file.name) &&
-        !personalData.passportDetails.passportUpload.includes(file.name) &&
+        !deletedFiles.some((deletedFileUrl) => deletedFileUrl.includes(file.name)) &&
         (uploadType !== "profilePicture" || file.name !== personalData.personalInformation.profilePicture)
     );
   
@@ -193,20 +193,25 @@ const Form1 = ({
   
     setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
   
+    const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
     if (uploadType === "profilePicture") {
       setPersonalData((prevData) => ({
         ...prevData,
         personalInformation: {
           ...prevData.personalInformation,
-          profilePicture: "", // Reset until the file is uploaded
+          profilePicture: blobUrls[0], // Set temporary blob URL
         },
       }));
     } else if (uploadType === "passportUpload") {
+      const updatedPassportUpload = [
+        ...(prevData.passportDetails.passportUpload ? prevData.passportDetails.passportUpload.split(",") : []),
+        ...blobUrls,
+      ].join(",");
       setPersonalData((prevData) => ({
         ...prevData,
         passportDetails: {
           ...prevData.passportDetails,
-          passportUpload: [...prevData.passportDetails.passportUpload],
+          passportUpload: updatedPassportUpload,
         },
       }));
     }
@@ -286,15 +291,16 @@ const Form1 = ({
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
-          toast.success(`File ${fileUrl} deleted successfully.`);
+          // toast.success(`File ${fileUrl} deleted successfully.`);
         } catch (error) {
-          toast.error(`Error deleting file: ${fileUrl}`);
+          // toast.error(`Error deleting file: ${fileUrl}`);
         }
       }
   
       // Step 2: Upload new files
       let profilePictureUrl = personalData.personalInformation.profilePicture;
-      const uploadedUrls = [];
+      const firebaseUrls = []; // Collect Firebase URLs
+  
       for (const file of newFiles) {
         const storageRef = ref(storage, `uploads/student/${file.name}`);
         try {
@@ -304,40 +310,32 @@ const Form1 = ({
   
           if (file.type === "image/jpeg" || file.type === "image/png") {
             profilePictureUrl = downloadURL; // Update profile picture URL
-          } else {
-            uploadedUrls.push(downloadURL); // Add to passport uploads
-          }
-  
-          if (file.type === "image/jpeg" || file.type === "image/png") {
-            // Update profile picture in the state
             setPersonalData((prevData) => ({
               ...prevData,
               personalInformation: {
                 ...prevData.personalInformation,
-                profilePicture: downloadURL,
+                profilePicture: downloadURL, // Replace blob URL with Firebase URL
               },
             }));
           } else {
-            // Update passport uploads in the state
+            firebaseUrls.push(downloadURL); // Add Firebase URLs
             setPersonalData((prevData) => ({
               ...prevData,
               passportDetails: {
                 ...prevData.passportDetails,
-                passportUpload: [...prevData.passportDetails.passportUpload, downloadURL],
+                passportUpload: prevData.passportDetails.passportUpload.map((url) =>
+                  url.startsWith("blob:") ? downloadURL : url
+                ), // Replace blob URLs with Firebase URLs
               },
             }));
           }
-  
-          // toast.success(`${file.name} uploaded successfully.`);
         } catch (error) {
           toast.error(`Error uploading ${file.name}.`);
         }
       }
-      const passportUploadString = [
-        ...(personalData.passportDetails.passportUpload || []),
-        ...uploadedUrls,
-      ].join(",");
+  
       // Step 3: Prepare payload
+      const passportUploadString = firebaseUrls.join(",");
       const payload = {
         personalInformation: {
           ...personalData.personalInformation,
@@ -347,9 +345,9 @@ const Form1 = ({
             phone: personalData.personalInformation.phone.phone,
           },
         },
-         passportDetails: {
+        passportDetails: {
           ...personalData.passportDetails,
-          passportUpload: passportUploadString
+          passportUpload: passportUploadString, // Save Firebase URLs as a string
         },
       };
   
@@ -365,10 +363,7 @@ const Form1 = ({
         // Clear temporary states
         setNewFiles([]);
         setDeletedFiles([]);
-        {editForm &&
-         handleCancel()}
-       
-      
+        editForm && handleCancel();
       } else {
         toast.info(res?.message);
       }
