@@ -376,6 +376,12 @@ const Form1 = ({
         // Clear temporary states
         setNewFiles([]);
         setDeletedFiles([]);
+        if (hide === true) {
+          dispatch(studentInfo(studentFormId));
+        }
+        if (hide === false) {
+          dispatch(getStudentData(studentId));
+        }
         editForm && handleCancel();
       } else {
         toast.info(res?.message);
