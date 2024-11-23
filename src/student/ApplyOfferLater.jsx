@@ -36,7 +36,7 @@ import PopUp from "../components/reusable/PopUp";
 import { greenTick } from "../assets";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Sidebar from "../components/dashboardComp/Sidebar";
-
+import { v4 as uuidv4 } from 'uuid';
 const initialPersonalInfo = {
   fullName: "",
   email: "",
@@ -313,7 +313,8 @@ const ApplyOfferLater = () => {
     let uploadedUrls = [];
 
     for (const file of files) {
-      const storageRef = ref(storage, `uploads/${file.name}`);
+      const uniqueFileName = `${uuidv4()}-${file.name}`;
+      const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
 
       try {
         const snapshot = await uploadBytes(storageRef, file);

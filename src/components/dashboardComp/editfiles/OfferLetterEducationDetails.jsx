@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbPencilMinus } from "react-icons/tb";
 import { FaRegEye } from "react-icons/fa";
-
+import { v4 as uuidv4 } from 'uuid';
 // Define required marksheets for each education level
 const educationLevels = {
   diploma: ["markSheet10"],
@@ -162,7 +162,7 @@ const handleSubmit = async () => {
       const storageRef = ref(storage, fileUrl);
       try {
         await deleteObject(storageRef);
-        toast.success(`File ${fileUrl} deleted successfully.`);
+        // toast.success(`File ${fileUrl} deleted successfully.`);
       } catch (error) {
         toast.error(`Error deleting file: ${fileUrl}`);
       }
@@ -173,7 +173,8 @@ const handleSubmit = async () => {
 
     await Promise.all(
       newFiles.map(async ({ file, uploadType }) => {
-        const storageRef = ref(storage, `uploads/offerLetter/${file.name}`);
+        const uniqueFileName = `${uuidv4()}-${file.name}`;
+        const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
         try {
           const snapshot = await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(snapshot.ref);
@@ -181,7 +182,7 @@ const handleSubmit = async () => {
           // Update temporary object with Firebase URL
           updatedEducationDetails[uploadType] = downloadURL;
 
-          toast.success(`${file.name} uploaded successfully.`);
+          // toast.success(`${file.name} uploaded successfully.`);
         } catch (error) {
           toast.error(`Error uploading ${file.name}. Please try again.`);
         }

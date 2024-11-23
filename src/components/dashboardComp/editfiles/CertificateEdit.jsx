@@ -14,7 +14,7 @@ import { FaFileUpload, FaRegEye } from "react-icons/fa";
 import { OfferLetterCertificate } from "../../../features/generalApi";
 import { useSelector } from "react-redux";
 import { RiDeleteBin6Line } from "react-icons/ri";
-
+import { v4 as uuidv4 } from 'uuid';
 const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
   const [offerLater, setOfferLater] = useState({
     certificate: { url: [] },
@@ -130,7 +130,8 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       let uploadedUrls = [];
       if (newFiles.length > 0) {
         for (const file of newFiles) {
-          const storageRef = ref(storage, `uploads/offerLetter/${file.name}`);
+          const uniqueFileName = `${uuidv4()}-${file.name}`;
+          const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
           try {
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
