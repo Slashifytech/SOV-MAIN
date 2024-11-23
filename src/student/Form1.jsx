@@ -130,7 +130,7 @@ const Form1 = ({
     if (hide === false) {
       dispatch(getStudentData(studentId));
     }
-  }, [dispatch]);
+  }, [dispatch, studentFormId, studentId]);
   const handleInput = (e) => {
     const { name, value } = e.target;
     const [section, field] = name.split(".");
@@ -226,46 +226,43 @@ const Form1 = ({
     const isFirebaseUrl = fileUrl.startsWith("http");
   
     setPersonalData((prevData) => {
-      const passportUpload = Array.isArray(prevData?.passportDetails?.passportUpload)
-        ? prevData.passportDetails.passportUpload
-        : prevData.passportDetails.passportUpload
-        ? prevData.passportDetails.passportUpload.split(",")
-        : [];
+      if (uploadType === "passportUpload") {
+        const passportUpload = Array.isArray(prevData?.passportDetails?.passportUpload)
+          ? prevData.passportDetails.passportUpload
+          : prevData.passportDetails.passportUpload
+          ? prevData.passportDetails.passportUpload.split(",")
+          : [];
   
-      if (!isFirebaseUrl) {
-        setResetPassportUpload(true);
+        const updatedPassportUpload = passportUpload.filter((url) => url !== fileUrl);
+  
+        if (isFirebaseUrl) {
+          setDeletedFiles((prevState) => [...prevState, fileUrl]);
+        }
+  
         return {
           ...prevData,
           passportDetails: {
             ...prevData.passportDetails,
-            passportUpload: "", // Remove URL entirely
-          },
-        };
-      } else {
-        setDeletedFiles((prevState) => [...prevState, fileUrl]);
-        return {
-          ...prevData,
-          passportDetails: {
-            ...prevData.passportDetails,
-            passportUpload: "", // Remove URL entirely
+            passportUpload: updatedPassportUpload, // Remove specific URL
           },
         };
       }
-    });
   
-    if (uploadType === "profilePicture") {
-      setPersonalData((prevData) => ({
-        ...prevData,
-        personalInformation: {
-          ...prevData.personalInformation,
-          profilePicture: "", // Remove profile picture
-        },
-      }));
-    }
+      if (uploadType === "profilePicture") {
+        return {
+          ...prevData,
+          personalInformation: {
+            ...prevData.personalInformation,
+            profilePicture: "", // Clear profile picture
+          },
+        };
+      }
+  
+      return prevData;
+    });
   
     // toast.info("File has been marked for deletion.");
   };
-  
 
   useEffect(() => {
     if (personalInfo || passportInfo) {
@@ -306,20 +303,21 @@ const Form1 = ({
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
+          console.log("deltetd")
         } catch (error) {
-          // console.error(`Error deleting file: ${fileUrl}`);
+          console.error(`Error deleting file: ${fileUrl}`);
         }
       }
   
       let profilePictureUrl = personalData.personalInformation.profilePicture;
-      let firebaseUrl = "";
+      let updatedPassportUpload = personalData.passportDetails.passportUpload;
   
       for (const file of newFiles) {
         // const storageRef = ref(storage, `uploads/student/${file.name}`);
         const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_"); // Sanitize file name
         const uniqueFileName = `${uuidv4()}-${sanitizedFileName}`;
 
-        console.log("Uploading file with unique name:", uniqueFileName)
+        // console.log("Uploading file with unique name:", uniqueFileName)
         const storageRef = ref(storage, `uploads/student/${uniqueFileName}`);
         try {
           setIsSubmitting(true);
@@ -336,19 +334,20 @@ const Form1 = ({
               },
             }));
           } else {
-            firebaseUrl = downloadURL; // Replace any existing URL
-            setPersonalData((prevData) => ({
-              ...prevData,
-              passportDetails: {
-                ...prevData.passportDetails,
-                passportUpload: firebaseUrl, // Replace blob URL with Firebase URL
-              },
-            }));
+            updatedPassportUpload = Array.isArray(updatedPassportUpload)
+            ? [...updatedPassportUpload, downloadURL]
+            : [downloadURL];
           }
         } catch (error) {
           toast.error(`Error uploading ${file.name}.`);
         }
       }
+      if (!newFiles.length && Array.isArray(personalData.passportDetails.passportUpload)) {
+        updatedPassportUpload = personalData.passportDetails.passportUpload;
+      }
+      const passportUploadString = Array.isArray(updatedPassportUpload)
+      ? updatedPassportUpload.join(",")
+      : updatedPassportUpload;
       const payload = {
         personalInformation: {
           ...personalData.personalInformation,
@@ -360,7 +359,7 @@ const Form1 = ({
         },
         passportDetails: {
           ...personalData.passportDetails,
-          passportUpload: firebaseUrl, // Save Firebase URLs as a string
+          passportUpload: passportUploadString, 
         },
       };
   
@@ -391,7 +390,6 @@ const Form1 = ({
       toast.error(error?.message || "Something went wrong.");
     }
   };
-  
   return (
     <div className="min-h-screen]">
       <div className={`${customClass}`}>
