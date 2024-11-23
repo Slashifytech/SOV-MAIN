@@ -316,7 +316,10 @@ const Form1 = ({
   
       for (const file of newFiles) {
         // const storageRef = ref(storage, `uploads/student/${file.name}`);
-        const uniqueFileName = `${uuidv4()}-${file.name}`;
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_"); // Sanitize file name
+        const uniqueFileName = `${uuidv4()}-${sanitizedFileName}`;
+
+        console.log("Uploading file with unique name:", uniqueFileName)
         const storageRef = ref(storage, `uploads/student/${uniqueFileName}`);
         try {
           setIsSubmitting(true);
