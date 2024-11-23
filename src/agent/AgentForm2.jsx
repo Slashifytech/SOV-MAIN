@@ -22,7 +22,7 @@ import {
 import { storage } from "../utils/fireBase";
 import { agentInformation } from "../features/agentSlice";
 import { ImBin } from "react-icons/im";
-
+import { v4 as uuidv4 } from 'uuid';
 const initialContactData = {
   title: "",
   firstName: "",
@@ -104,7 +104,9 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
     for (const file of files) {
       console.log(`Uploading file: ${file.name}`);
 
-      const storageRef = ref(storage, `uploads/${file.name}`); 
+      // const storageRef = ref(storage, `uploads/agentData${file.name}`); 
+      const uniqueFileName = `${uuidv4()}-${file.name}`;
+      const storageRef = ref(storage, `uploads/agentData/${uniqueFileName}`);
       try {
         // Upload each file
         const snapshot = await uploadBytes(storageRef, file);

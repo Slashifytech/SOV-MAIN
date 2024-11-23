@@ -103,7 +103,7 @@ const [newFiles, setNewFiles] = useState([]);
       },
     }));
   
-    toast.info(`${files[0].name} will be uploaded upon saving.`);
+    // toast.info(`${files[0].name} will be uploaded upon saving.`);
   };
   
 
@@ -125,7 +125,7 @@ const [newFiles, setNewFiles] = useState([]);
       },
     }));
   
-    toast.info("File marked for deletion. Changes will be applied upon saving.");
+    // toast.info("File marked for deletion. Changes will be applied upon saving.");
   };
   
 
@@ -164,7 +164,7 @@ const handleSubmit = async () => {
         await deleteObject(storageRef);
         // toast.success(`File ${fileUrl} deleted successfully.`);
       } catch (error) {
-        toast.error(`Error deleting file: ${fileUrl}`);
+        // toast.error(`Error deleting file: ${fileUrl}`);
       }
     }
 

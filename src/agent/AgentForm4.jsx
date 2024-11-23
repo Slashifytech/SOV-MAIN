@@ -29,7 +29,7 @@ import { storage } from "../utils/fireBase";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { agentInformation } from "../features/agentSlice";
-
+import { v4 as uuidv4 } from 'uuid';
 const AgentForm4 = ({hide, handleCancel, updateData}) => {
   const { countryOption } = useSelector((state) => state.general);
   const { agentData } = useSelector((state) => state.agent);
@@ -163,7 +163,9 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
     console.log("Selected file:", file);
     if (!file) return;
 
-    const storageRef = ref(storage, `files/${file?.name}`);
+    // const storageRef = ref(storage, `files/Company/${file?.name}`);
+    const uniqueFileName = `${uuidv4()}-${file.name}`;
+    const storageRef = ref(storage, `files/Company/${uniqueFileName}`);
     try {
       const snapshot = await uploadBytes(storageRef, file);
       console.log("Uploaded file:", snapshot);

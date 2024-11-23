@@ -29,7 +29,7 @@ import { getStudentData, studentInfo } from "../features/studentSlice";
 import ImageComponent from "./../components/reusable/Input";
 import { ImBin } from "react-icons/im";
 import { RiDeleteBin6Line } from "react-icons/ri";
-
+import { v4 as uuidv4 } from 'uuid';
 const Form1 = ({
   customClass,
   hide,
@@ -43,7 +43,7 @@ const Form1 = ({
   const studentData = useSelector((state) => state.student.studentInformation);
   const IdToAddStudent = location?.state?.id?.id; // for comppleting pending student profile to get data if exists
   const studentInformation = hide ? studentInfoData : studentData;
-  console.log(studentInformation, IdToAddStudent);
+  // console.log(studentInformation, IdToAddStudent);
   const navigate = useNavigate();
   const [resetProfilePic, setResetProfilePic] = useState(false);
   const [resetPassportUpload, setResetPassportUpload] = useState(false);
@@ -307,7 +307,7 @@ const Form1 = ({
         try {
           await deleteObject(storageRef);
         } catch (error) {
-          console.error(`Error deleting file: ${fileUrl}`);
+          // console.error(`Error deleting file: ${fileUrl}`);
         }
       }
   
@@ -315,7 +315,9 @@ const Form1 = ({
       let firebaseUrl = "";
   
       for (const file of newFiles) {
-        const storageRef = ref(storage, `uploads/student/${file.name}`);
+        // const storageRef = ref(storage, `uploads/student/${file.name}`);
+        const uniqueFileName = `${uuidv4()}-${file.name}`;
+        const storageRef = ref(storage, `uploads/student/${uniqueFileName}`);
         try {
           setIsSubmitting(true);
           const snapshot = await uploadBytes(storageRef, file);
