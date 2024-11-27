@@ -289,7 +289,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
             } `}
           >
             <span className="w-1/2 flex flex-col text-[15px] mt-3">
-              <span className="font-light">Destination country </span>
+              <span className="font-light">Country </span>
               <span className="font-medium">{data?.fullName || "NA"}</span>
               <span className="font-light mt-4">Position/Job Title</span>
               <span className="font-medium">
@@ -517,7 +517,29 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               ) : (
                 "NA"
               )}
+            
+              <span className="font-light mt-4">
+                Company GST
+              </span>
+              {agentData?.companyOverview?.companyGST ? (
+                <a
+                  className="flex items-center gap-3 text-primary font-medium"
+                  href={
+                    agentData?.companyOverview?.companyGST
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Uploaded
+                  <span>
+                    <FaRegEye />
+                  </span>
+                </a>
+              ) : (
+                "NA"
+              )}
             </span>
+
             <span className="flex flex-col items-start w-1/2">
               <span className="font-light mt-4">
                 What type of Business Registration?{" "}
@@ -541,9 +563,24 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               ) : (
                 "NA"
               )}
+              <span className="font-light mt-4">PAN Card </span>
+              {agentData?.companyOverview?.companyPan ? (
+                <a
+                  className="flex items-center gap-3 text-primary font-medium"
+                  href={agentData?.companyOverview?.companyPan}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Uploaded
+                  <span>
+                    <FaRegEye />
+                  </span>
+                </a>
+              ) : (
+                "NA"
+              )}
             </span>
           </span>
-
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">
               What type of Higher Education Programmes are your Customer
@@ -643,21 +680,29 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               How do you advertise your services?
             </span>
             <span className="font-medium">
-              {agentData?.companyOperations?.advertisementMethods.map(
+              {agentData?.companyOperations?.advertisementMethods?.length ? (
+                agentData.companyOperations.advertisementMethods.map(
+                  (data, index) => (
+                    <span className="font-medium" key={index}>
+                      {data || "NA"}
+                    </span>
+                  )
+                )
+              ) : (
+                <span className="font-medium">NA</span>
+              )}
+            </span>
+            <span className="font-light mt-4">Social Media</span>
+            {agentData?.companyOperations?.socialMediaPlatforms?.length ? (
+              agentData.companyOperations.socialMediaPlatforms.map(
                 (data, index) => (
                   <span className="font-medium" key={index}>
                     {data || "NA"}
                   </span>
                 )
-              )}
-            </span>
-            <span className="font-light mt-4">Social Media</span>
-            {agentData?.companyOperations?.socialMediaPlatforms.map(
-              (data, index) => (
-                <span className="font-medium" key={index}>
-                  {data || "NA"}
-                </span>
               )
+            ) : (
+              <span className="font-medium">NA</span>
             )}
           </span>
         </div>

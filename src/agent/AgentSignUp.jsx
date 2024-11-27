@@ -416,6 +416,8 @@ const AgentSignUp = () => {
                   </span>
                   <div className="w-[50%] mt-5">
                     <PhoneInputComponent
+                    notImp={true}
+
                       phoneData={agentRegister.primaryContactPerson.phone}
                       onPhoneChange={(phoneData) =>
                         handlePhoneChange(phoneData, "primaryContactPerson")
