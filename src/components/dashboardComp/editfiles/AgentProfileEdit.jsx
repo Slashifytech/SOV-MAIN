@@ -563,7 +563,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               ) : (
                 "NA"
               )}
-              <span className="font-light mt-4">PAN Card </span>
+              <span className="font-light mt-4">Company PAN Card </span>
               {agentData?.companyOverview?.companyPan ? (
                 <a
                   className="flex items-center gap-3 text-primary font-medium"

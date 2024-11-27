@@ -411,7 +411,7 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
               )}
               <div className="mt-4">
                 <FileUpload
-                  label="Pan Card"
+                  label="Company Pan Card"
                   onFileSelect={(file) =>
                     handleFileSelect("companyPan", file)
                   }
