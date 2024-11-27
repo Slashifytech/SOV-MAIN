@@ -7,23 +7,24 @@ import {
 } from "../components/reusable/Input";
 import { formFiveSubmit } from "../features/agentApi";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { agentInformation } from "../features/agentSlice";
+import { IoArrowBackSharp } from "react-icons/io5";
 
-const AgentForm5 = ({hide, handleCancel, updateData}) => {
+const AgentForm5 = ({ hide, handleCancel, updateData }) => {
   const { agentData } = useSelector((state) => state.agent);
   const getData = agentData?.companyOperations;
   const [operationsData, setOperationData] = useState({
     numberOfCounselors: "",
     averageExperienceYears: "",
-    advertisementMethods: [], 
-    socialMediaPlatforms: [], 
+    advertisementMethods: [],
+    socialMediaPlatforms: [],
   });
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
-  const editForm = hide === true ? "edit":null;
+  const editForm = hide === true ? "edit" : null;
 
   useEffect(() => {
     dispatch(agentInformation());
@@ -35,7 +36,7 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
     // Convert to integer for specific fields
     const newValue =
       name === "numberOfCounselors" || name === "averageExperienceYears"
-        ? parseInt(value, 10) || "" 
+        ? parseInt(value, 10) || ""
         : value;
 
     setOperationData((prevData) => ({
@@ -105,34 +106,41 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
 
   // Submit form
   const handleSubmit = async () => {
-    if (validateFields()) {
-      try {
-        const res = await formFiveSubmit(operationsData, editForm);
+    // if (validateFields()) {
+    try {
+      const res = await formFiveSubmit(operationsData, editForm);
 
-        toast.success(res?.message || "Data added successfully");
-        {hide === true ? updateData() : 
-        navigate("/agent-form/6", { state: "passPage" })}
-      } catch (error) {
-        console.log(error);
-        toast.error(error?.message || "Something went wrong");
+      toast.success(res?.message || "Data added successfully");
+      {
+        hide === true
+          ? updateData()
+          : navigate("/agent-form/6", { state: "passPage" });
       }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.message || "Something went wrong");
     }
+    // }
   };
 
   return (
     <div className="min-h-screen font-poppins">
-      <div className={`${hide === true? "" : "md:mx-48 sm:mx-10"}`}>
-      {hide === true ? "" : <>
-        <p className="text-heading font-semibold text-[25px] pt-7">
-          Company Operations
-        </p></>}
+      <div className={`${hide === true ? "" : "md:mx-48 sm:mx-10"}`}>
+        {hide === true ? (
+          ""
+        ) : (
+          <>
+            <p className="text-heading font-semibold text-[25px] pt-7">
+              Company Operations
+            </p>
+          </>
+        )}
         <div
           className={`bg-white rounded-xl ${
             hide === true ? "" : "px-8"
           } py-4 pb-12 mt-6`}
         >
           <Register
-            imp="*"
             name="numberOfCounselors"
             type="text"
             label="How many counselors do you have?"
@@ -147,7 +155,6 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
           )}
 
           <Register
-            imp="*"
             name="averageExperienceYears"
             type="text"
             label="On average, how many years of relevant experience do your counselors have?"
@@ -162,7 +169,7 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
           )}
 
           <div className="text-secondary text-[14px] mt-6">
-            How do you advertise your services?*
+            How do you advertise your services?
           </div>
           <CheckboxGroup
             options={advertiseOption}
@@ -193,8 +200,8 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
             </p>
           )}
         </div>
-        {hide === true ?
-        <div className="flex justify-end mt-9 gap-4 ">
+        {hide === true ? (
+          <div className="flex justify-end mt-9 gap-4 ">
             <button
               className="border border-greyish text-black px-4 py-2 rounded"
               onClick={() => handleCancel("isFive")}
@@ -209,14 +216,37 @@ const AgentForm5 = ({hide, handleCancel, updateData}) => {
               }}
             >
               Save
-            </button> 
-            </div> :  
-        <FormNavigationButtons
-          backLink="/agent-form/4"
-          backText="Back"
-          buttonText="Submit and Continue"
-          handleButtonClick={handleSubmit}
-        />}
+            </button>
+          </div>
+        ) : (
+          <>
+            <span className="flex flex-row items-center justify-between w-full mt-12 mb-20">
+              <span className="flex items-center">
+                <IoArrowBackSharp />
+                <Link
+                  state={"passPage"}
+                  to="/agent-form/4"
+                  className="text-sidebar  text-[16px] cursor-pointer"
+                >
+                  Back
+                </Link>
+              </span>
+              <Link
+                state={"passPage"}
+                to="/agent-form/6"
+                className="text-sidebar underline text-[16px] cursor-pointer"
+              >
+                Skip for now
+              </Link>
+              <span
+                onClick={handleSubmit}
+                className="bg-primary text-white cursor-pointer rounded-md px-6 py-2"
+              >
+                Submit and Continue
+              </span>
+            </span>
+          </>
+        )}
       </div>
     </div>
   );

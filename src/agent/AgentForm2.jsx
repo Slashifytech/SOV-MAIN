@@ -185,15 +185,15 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
     });
 
     // Validate admissionsContacts data
-    contactData.admissionsContacts.forEach((admission, index) => {
-      Object.keys(admission).forEach((key) => {
-        if (!admission[key]) {
-          validationErrors[`${key}Admission${index}`] = `${key} is required`;
-        } else if (key === "email" && !/\S+@\S+\.\S+/.test(admission[key])) {
-          validationErrors[`${key}Admission${index}`] = "Invalid email format";
-        }
-      });
-    });
+    // contactData.admissionsContacts.forEach((admission, index) => {
+    //   Object.keys(admission).forEach((key) => {
+    //     if (!admission[key]) {
+    //       validationErrors[`${key}Admission${index}`] = `${key} is required`;
+    //     } else if (key === "email" && !/\S+@\S+\.\S+/.test(admission[key])) {
+    //       validationErrors[`${key}Admission${index}`] = "Invalid email format";
+    //     }
+    //   });
+    // });
 
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
@@ -558,7 +558,6 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               <div className="flex items-baseline justify-between gap-6 w-full">
                 <span className="w-[50%]">
                   <Register
-                    imp="*"
                     name="fullName"
                     type="text"
                     label="Full Name"
@@ -571,7 +570,6 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
                 </span>
                 <span className="w-[50%]">
                   <Register
-                    imp="*"
                     name="positionJobTitle"
                     type="text"
                     label="Position/Job Title"
@@ -587,6 +585,8 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               <div className="flex items-baseline justify-between gap-6 w-full">
                 <span className="w-[50%]">
                   <CountrySelect
+                notImp={true}
+
                     name="destinationCountry"
                     customClass="bg-input"
 
@@ -601,7 +601,7 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
                 </span>
                 <span className="w-[50%]">
                   <Register
-                    imp="*"
+                    
                     name="email"
                     type="email"
                     label="Email"
@@ -615,6 +615,8 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               </div>
               <div className="mt-8">
                 <PhoneInputComponent
+                notImp={true}
+
                   label="Phone Number"
                   phoneData={admission.mobileNumber}
                   onPhoneChange={(phoneData) =>

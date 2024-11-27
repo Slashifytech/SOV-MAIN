@@ -7,8 +7,9 @@ import {
   CountrySelect,
   FormNavigationButtons,
 } from "../components/reusable/Input";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { agentInformation } from "../features/agentSlice";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 const AgentForm3 = ({hide, handleCancel, updateData}) => {
   const { countryOption } = useSelector((state) => state.general);
@@ -76,7 +77,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (validateFields()) {
+    // if (validateFields()) {
       // Filter out empty fields
       const filteredBankData = Object.fromEntries(
         Object.entries(bankData).filter(([_, value]) => value !== "")
@@ -92,7 +93,7 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
         console.log(error);
         toast.error(error?.message || "Something went wrong");
       }
-    }
+    // }  
   };
   
 
@@ -264,12 +265,31 @@ const AgentForm3 = ({hide, handleCancel, updateData}) => {
               Save
             </button> 
             </div> :  
-        <FormNavigationButtons
-          backLink="/agent-form/2"
-          backText="Back"
-          buttonText="Submit and Continue"
-          handleButtonClick={handleSubmit}
-        />}
+            <span className="flex flex-row items-center justify-between w-full mt-12 mb-20">
+              <span className="flex items-center">
+                <IoArrowBackSharp />
+                <Link
+                  state={"passPage"}
+                  to="/agent-form/2"
+                  className="text-sidebar  text-[16px] cursor-pointer"
+                >
+                  Back
+                </Link>
+              </span>
+              <Link
+                state={"passPage"}
+                to="/agent-form/4"
+                className="text-sidebar underline text-[16px] cursor-pointer"
+              >
+                Skip for now
+              </Link>
+              <span
+                onClick={handleSubmit}
+                className="bg-primary text-white cursor-pointer rounded-md px-6 py-2"
+              >
+                Submit and Continue
+              </span>
+            </span>}
       </div>
     </div>
   );

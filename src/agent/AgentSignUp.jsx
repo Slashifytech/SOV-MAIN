@@ -25,7 +25,7 @@ const AgentSignUp = () => {
   const [agentRegister, setAgentRegister] = useState({
     companyDetails: {
       companyName: "",
-      tradeName: "",
+      // tradeName: "",
       address: "",
       country: "",
       province: "",
@@ -202,7 +202,7 @@ const AgentSignUp = () => {
     const payload = {
       companyDetails: {
         companyName: agentRegister.companyDetails.companyName,
-        tradeName: agentRegister.companyDetails.tradeName,
+        // tradeName: agentRegister.companyDetails.tradeName,
         address: agentRegister.companyDetails.address,
         country: agentRegister.companyDetails.country,
         province: agentRegister.companyDetails.province,
@@ -291,14 +291,14 @@ const AgentSignUp = () => {
                   value={agentRegister.companyDetails.companyName}
                   errors={errors.companyName}
                 />
-                <Register
+                {/* <Register
                   name="companyDetails.tradeName"
                   type="text"
                   label="Company Alternate Name"
                   handleInput={handleInput}
                   value={agentRegister.companyDetails.tradeName}
                   errors={errors.tradeName}
-                />
+                /> */}
                 <Register
                   name="primaryContactPerson.name"
                   type="text"

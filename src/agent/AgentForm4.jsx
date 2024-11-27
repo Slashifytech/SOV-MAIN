@@ -30,7 +30,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { agentInformation } from "../features/agentSlice";
 import { v4 as uuidv4 } from 'uuid';
-const AgentForm4 = ({hide, handleCancel, updateData}) => {
+
+const AgentForm4 = ({ hide, handleCancel, updateData }) => {
   const { countryOption } = useSelector((state) => state.general);
   const { agentData } = useSelector((state) => state.agent);
   const getData = agentData?.companyOverview;
@@ -46,6 +47,8 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
     businessRegistrationType: "",
     businessRegistrationDocument: "",
     businessProfileDocument: "",
+    companyGST: "",
+    companyPan: "",
     higherEducationProgrammes: [],
     financeSources: [],
     studyDestinations: [],
@@ -53,7 +56,7 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
 
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
-  const editForm = hide === true ? "edit":null;
+  const editForm = hide === true ? "edit" : null;
 
   useEffect(() => {
     dispatch(agentInformation());
@@ -134,26 +137,20 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
     if (!overviewData.businessRegistrationDocument) {
       formErrors.businessRegistrationDocument =
         "Please upload required document.";
-    }   if (!overviewData.businessProfileDocument) {
-      formErrors.businessProfileDocument =
-        "Please upload required document.";
+    }
+    if (!overviewData.businessProfileDocument) {
+      formErrors.businessProfileDocument = "Please upload required document.";
     }
     if (!overviewData.businessRegistrationNumber) {
       formErrors.businessRegistrationNumber =
         "Please enter the business registration number.";
     }
-    if (overviewData.higherEducationProgrammes.length === 0) {
-      formErrors.higherEducationProgrammes =
-        "Please select at least one interested program.";
+    if (!overviewData.companyPan && !overviewData.companyGST) {
+      formErrors.companyPan = "Please upload Company PAN or Company GST.";
+      formErrors.companyGST = "Please upload Company PAN or Company GST.";
     }
-    if (overviewData.financeSources.length === 0) {
-      formErrors.financeSources =
-        "Please select at least one source of finance.";
-    }
-    if (overviewData.studyDestinations.length === 0) {
-      formErrors.studyDestinations = "Please select at least one destination.";
-    }
-
+  
+ 
     setErrors(formErrors);
 
     return Object.keys(formErrors).length === 0;
@@ -163,7 +160,7 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
     console.log("Selected file:", file);
     if (!file) return;
 
-    // const storageRef = ref(storage, `files/Company/${file?.name}`);
+    // const storageRef = ref(storage, `files/${file?.name}`);
     const uniqueFileName = `${uuidv4()}-${file.name}`;
     const storageRef = ref(storage, `files/Company/${uniqueFileName}`);
     try {
@@ -203,6 +200,16 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
           ...prevData,
           businessProfileDocument: "",
         }));
+      } else if (uploadType === "companyGST") {
+        setOverviewData((prevData) => ({
+          ...prevData,
+          companyGST: "",
+        }));
+      } else if (uploadType === "companyPan") {
+        setOverviewData((prevData) => ({
+          ...prevData,
+          companyPan: "",
+        }));
       }
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -235,6 +242,8 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
           prevData.businessRegistrationDocument,
         businessProfileDocument:
           getData.businessProfileDocument || prevData.businessProfileDocument,
+        companyGST: getData.companyGST || prevData.companyGST,
+        companyPan: getData.companyPan || prevData.companyPan,
         higherEducationProgrammes:
           getData.higherEducationProgrammes ||
           prevData.higherEducationProgrammes,
@@ -250,9 +259,13 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
       try {
         console.log("Submitting data:", overviewData);
         const res = await formFourSubmit(overviewData, editForm);
-       
+
         toast.success(res?.message || "Data added successfully");
-       {hide === true ?  updateData() : navigate("/agent-form/5", { state: "passPage" })}
+        {
+          hide === true
+            ? updateData()
+            : navigate("/agent-form/5", { state: "passPage" });
+        }
       } catch (error) {
         console.error(error);
         toast.error(error?.message || "Something went wrong");
@@ -261,11 +274,16 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
   };
   return (
     <div className="min-h-screen font-poppins">
-      <div className={`${hide === true? "" : "md:mx-48 sm:mx-10"}`}>
-      {hide === true ? "" : <>
-        <p className="text-heading font-semibold text-[25px] pt-7">
-          Company Overview
-        </p></>}
+      <div className={`${hide === true ? "" : "md:mx-48 sm:mx-10"}`}>
+        {hide === true ? (
+          ""
+        ) : (
+          <>
+            <p className="text-heading font-semibold text-[25px] pt-7">
+              Company Overview
+            </p>
+          </>
+        )}
         <div
           className={`bg-white rounded-xl ${
             hide === true ? "" : "px-8"
@@ -274,7 +292,7 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
           <div className="flex items-start justify-between gap-6 w-full">
             <span className="w-[50%]">
               <SelectComponent
-              notImp={false}
+                notImp={false}
                 name="businessOperationStartYear"
                 label="Starting Year of Business Operation"
                 options={yearOpton}
@@ -283,12 +301,11 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                 errors={errors.businessOperationStartYear}
               />
               <CountrySelect
-              notImp={false}
+                notImp={false}
                 name="popularDestinations[0]"
                 label="In your market, which countries are the most popular destinations? Please rank them from the most to least popular."
                 options={countryOption}
                 customClass="bg-input"
-
                 value={overviewData.popularDestinations[0]}
                 handleChange={(e) =>
                   handlePopularDestinationsChange(0, e.target.value)
@@ -299,7 +316,6 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                 name="popularDestinations[1]"
                 label="Popular Destination 2"
                 customClass="bg-input"
-
                 options={countryOption}
                 value={overviewData.popularDestinations[1]}
                 handleChange={(e) =>
@@ -310,7 +326,6 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                 name="popularDestinations[2]"
                 label="Popular Destination 3"
                 customClass="bg-input"
-
                 options={countryOption}
                 value={overviewData.popularDestinations[2]}
                 handleChange={(e) =>
@@ -332,7 +347,6 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                 name="studentSourceCountry"
                 label="Country"
                 customClass="bg-input"
-
                 options={countryOption}
                 value={overviewData.studentSourceCountry}
                 handleChange={handleInput}
@@ -355,24 +369,67 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
               {errors.governmentLicensed}
             </p>
           )}
+          <span className="w-[50%]">
+            <Register
+              name="businessRegistrationNumber"
+              type="text"
+              label="Business Registration Number"
+              handleInput={handleInput}
+              value={overviewData.businessRegistrationNumber}
+              errors={errors.businessRegistrationNumber}
+            />
+            <SelectComponent
+              notImp={true}
+              name="businessRegistrationType"
+              label="Business Registration Type"
+              options={regTypeOption}
+              value={overviewData.businessRegistrationType}
+              handleChange={handleInput}
+              errors={errors.businessRegistrationType}
+            />
+          </span>
           <div className="flex  items-baseline justify-between gap-6 w-full">
-            <span className="w-[50%]">
-              <Register
-                name="businessRegistrationNumber"
-                type="text"
-                label="Business Registration Number"
-                handleInput={handleInput}
-                value={overviewData.businessRegistrationNumber}
-                errors={errors.businessRegistrationNumber}
+            <span className="w-[50%] ">
+              <FileUpload
+                label="Aadhar Card"
+                onFileSelect={(file) =>
+                  handleFileSelect("companyGST", file)
+                }
+                deleteFile={() =>
+                  deleteFile(
+                    overviewData.companyGST,
+                    "companyGST"
+                  )
+                }
+                name="companyGST"
+                fileUrl={overviewData.companyGST}
               />
-              <SelectComponent
-                name="businessRegistrationType"
-                label="Business Registration Type"
-                options={regTypeOption}
-                value={overviewData.businessRegistrationType}
-                handleChange={handleInput}
-                errors={errors.businessRegistrationType}
-              />
+              {errors.companyGST && (
+                <p className="text-red-500 mt-1 text-sm">
+                  {errors.companyGST}
+                </p>
+              )}
+              <div className="mt-4">
+                <FileUpload
+                  label="Pan Card"
+                  onFileSelect={(file) =>
+                    handleFileSelect("companyPan", file)
+                  }
+                  deleteFile={() =>
+                    deleteFile(
+                      overviewData.companyPan,
+                      "companyPan"
+                    )
+                  }
+                  name="companyPan"
+                  fileUrl={overviewData.companyPan}
+                />
+                {errors.companyPan && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {errors.companyPan}
+                  </p>
+                )}
+              </div>
             </span>
             <span className="w-[50%] ">
               <FileUpload
@@ -389,11 +446,11 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                 name="businessRegistrationDocument"
                 fileUrl={overviewData.businessRegistrationDocument}
               />
-                        {errors.businessRegistrationDocument && (
-            <p className="text-red-500 mt-1 text-sm">
-              {errors.businessRegistrationDocument}
-            </p>
-          )}
+              {errors.businessRegistrationDocument && (
+                <p className="text-red-500 mt-1 text-sm">
+                  {errors.businessRegistrationDocument}
+                </p>
+              )}
               <div className="mt-4">
                 <FileUpload
                   label="Business Profile Document"
@@ -408,19 +465,18 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
                   }
                   name="businessProfileDocument"
                   fileUrl={overviewData.businessProfileDocument}
-                  
                 />
-                    {errors.businessProfileDocument && (
-            <p className="text-red-500 mt-1 text-sm">
-              {errors.businessProfileDocument}
-            </p>
-          )}
+                {errors.businessProfileDocument && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {errors.businessProfileDocument}
+                  </p>
+                )}
               </div>
             </span>
           </div>
           <div className="text-secondary text-[14px] mt-6 ">
             What type of Higher Education Programmes are your Customer
-            interested in?*
+            interested in?
           </div>
           <CheckboxGroup
             options={interestedProgramsOption}
@@ -437,7 +493,7 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
             </p>
           )}
           <div className="text-secondary text-[14px] mt-6 ">
-            What are the most common sources of finance of your students?*
+            What are the most common sources of finance of your students?
           </div>
           <CheckboxGroup
             options={sourceOfFinanceOption}
@@ -452,7 +508,7 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
           )}
           <div className="text-secondary text-[14px] mt-6  ">
             I am interested in receiving product information on the following
-            destination?*
+            destination?
           </div>
           <CheckboxGroup
             options={interestedDestinationOption}
@@ -469,8 +525,8 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
           )}
         </div>
 
-        {hide === true ?
-        <div className="flex justify-end mt-9 gap-4 ">
+        {hide === true ? (
+          <div className="flex justify-end mt-9 gap-4 ">
             <button
               className="border border-greyish text-black px-4 py-2 rounded"
               onClick={() => handleCancel("isFour")}
@@ -485,14 +541,16 @@ const AgentForm4 = ({hide, handleCancel, updateData}) => {
               }}
             >
               Save
-            </button> 
-            </div> :  
-        <FormNavigationButtons
-          backLink="/agent-form/3"
-          backText="Back"
-          buttonText="Submit and Continue"
-          handleButtonClick={handleSubmit}
-        />}
+            </button>
+          </div>
+        ) : (
+          <FormNavigationButtons
+            backLink="/agent-form/3"
+            backText="Back"
+            buttonText="Submit and Continue"
+            handleButtonClick={handleSubmit}
+          />
+        )}
       </div>
     </div>
   );
