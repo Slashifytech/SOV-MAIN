@@ -382,7 +382,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Branch Name</span>
             <span className="font-medium">
-            {agentData?.bankDetails?.branchName || "NA"}
+              {agentData?.bankDetails?.branchName || "NA"}
             </span>
             <span className="font-light mt-4">City</span>
             <span className="font-medium">
@@ -517,16 +517,12 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               ) : (
                 "NA"
               )}
-            
-              <span className="font-light mt-4">
-                Company GST
-              </span>
+
+              <span className="font-light mt-4">Company GST</span>
               {agentData?.companyOverview?.companyGST ? (
                 <a
                   className="flex items-center gap-3 text-primary font-medium"
-                  href={
-                    agentData?.companyOverview?.companyGST
-                  }
+                  href={agentData?.companyOverview?.companyGST}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -586,33 +582,43 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               What type of Higher Education Programmes are your Customer
               interested in?
             </span>
-            {agentData?.companyOverview?.higherEducationProgrammes?.map(
-              (data, index) => (
-                <span className="font-medium" key={index}>
-                  {data || "NA"}
-                </span>
+            {agentData?.companyOverview?.higherEducationProgrammes?.length ? (
+              agentData.companyOverview.higherEducationProgrammes.map(
+                (data, index) => (
+                  <span className="font-medium" key={index}>
+                    {data || "NA"}
+                  </span>
+                )
               )
+            ) : (
+              <span className="font-medium">NA</span>
             )}
 
             <span className="font-light mt-4">
               What are the most common sources of finance of your students?
             </span>
-            {agentData?.companyOverview?.financeSources?.map((data, index) => (
-              <span className="font-medium" key={index}>
-                {data || "NA"}
-              </span>
-            ))}
+            {agentData?.companyOverview?.financeSources?.length ? (
+              agentData.companyOverview.financeSources.map((data, index) => (
+                <span className="font-medium" key={index}>
+                  {data || "NA"}
+                </span>
+              ))
+            ) : (
+              <span className="font-medium">NA</span>
+            )}
 
             <span className="font-light mt-4">
               I am interested in receiving product information on the following
               destination?
             </span>
-            {agentData?.companyOverview?.studyDestinations?.map(
-              (data, index) => (
+            {agentData?.companyOverview?.studyDestinations?.length ? (
+              agentData.companyOverview.studyDestinations.map((data, index) => (
                 <span className="font-medium" key={index}>
                   {data || "NA"}
                 </span>
-              )
+              ))
+            ) : (
+              <span className="font-medium">NA</span>
             )}
           </span>
         </div>
