@@ -219,7 +219,7 @@ const CourseFeeFamilyDocUpdate = ({
           const uniqueFileName = `${uuidv4()}-${file.name}`;
           const storageRef = ref(
             storage,
-            `uploads/courseFeeApplication/test${uniqueFileName}`
+            `uploads/courseFeeApplication/${uniqueFileName}`
           );
 
           try {

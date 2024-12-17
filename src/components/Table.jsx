@@ -175,7 +175,7 @@ export function CustomTableTwo({
     const uniqueFileName = `${uuidv4()}-${file.name}`;
     const storageRef = ref(
       storage,
-      `uploads/adminApplications/test${uniqueFileName}`
+      `uploads/adminApplications/${uniqueFileName}`
     );
 
     try {

@@ -38,7 +38,7 @@ const VisaCompleteUpload = ({appId, studId}) => {
     const file = files[0]; 
     
     const uniqueFileName = `${uuidv4()}-${file.name}`;
-    const storageRef = ref(storage, `uploads/withdrawal/${uniqueFileName}`);
+    const storageRef = ref(storage, `uploads/visaStamp/${uniqueFileName}`);
 
     try {
       // Upload the file

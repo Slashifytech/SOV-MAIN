@@ -120,24 +120,26 @@ const VisaApply = () => {
   const validateFields = () => {
     const errors = {};
     const { personalDetails, studentDocument } = visaLetter;
-  
+
     // Personal Details Validation
     if (!personalDetails.fullName?.trim()) {
       errors.fullName = "Full name is required.";
     } else if (!/^[a-zA-Z\s]+$/.test(personalDetails.fullName)) {
       errors.fullName = "Full name can only contain alphabets and spaces.";
     }
-  
+
     if (!personalDetails.email) {
       errors.email = "Email is required.";
-    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(personalDetails.email)) {
+    } else if (
+      !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(personalDetails.email)
+    ) {
       errors.email = "Invalid email format.";
     }
-  
+
     if (!personalDetails.phoneNumber) {
       errors.phoneNumber = "Phone number is required.";
     }
-  
+
     // Address Validation
     if (!personalDetails.address.street?.trim()) {
       errors.street = "Street address is required.";
@@ -156,22 +158,25 @@ const VisaApply = () => {
     if (!personalDetails.address.country?.trim()) {
       errors.country = "Country is required.";
     }
-  
+
     // Student Document Validation
     Object.keys(initialStudentDocument).forEach((docType) => {
       // Skip 'pal' validation unless the country is Germany
       if (docType === "pal") {
         if (countryName === "Germany" && !studentDocument[docType]) {
-          errors[docType] = `${docType.replace(/([A-Z])/g, " $1")} is required.`;
+          errors[docType] = `${docType.replace(
+            /([A-Z])/g,
+            " $1"
+          )} is required.`;
         }
       } else if (!studentDocument[docType]) {
         errors[docType] = `${docType.replace(/([A-Z])/g, " $1")} is required.`;
       }
     });
-  
+
     return errors;
   };
-  
+
   const handleFilePopupOpen = (fileType) => {
     setFileType(fileType);
     setIsPopUp(true);
@@ -288,33 +293,35 @@ const VisaApply = () => {
     // toast.info("File marked for deletion.");
   };
 
-   function startSprinkles() {
-      const stopSprinkles = createSprinklesEffect();
-    
-      // Stop the sprinkles after 10 seconds
-      setTimeout(() => {
-        stopSprinkles();
-      }, 12000);
-    }
+  function startSprinkles() {
+    const stopSprinkles = createSprinklesEffect();
+
+    // Stop the sprinkles after 10 seconds
+    setTimeout(() => {
+      stopSprinkles();
+    }, 12000);
+  }
   const handleSubmit = async () => {
     const validationErrors = validateFields();
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       toast.error("Please fill all required fields");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
-  
+
       // Initialize `certificate` as an array of strings
-      const certificateArray = Array.isArray(visaLetter.studentDocument.certificate)
+      const certificateArray = Array.isArray(
+        visaLetter.studentDocument.certificate
+      )
         ? visaLetter.studentDocument.certificate
         : visaLetter.studentDocument.certificate
         ? [visaLetter.studentDocument.certificate] // Convert string to array
         : [];
-  
+
       const updatedStudentDocument = {
         country: countryName,
         studentInformationId: studentId,
@@ -329,7 +336,7 @@ const VisaApply = () => {
         loa: visaLetter.studentDocument.loa,
         certificate: certificateArray, // Ensure it's always an array
       };
-  
+
       // Handle new file uploads
       for (const { file, fileType, blobUrl } of newFiles) {
         const uniqueFileName = `${uuidv4()}-${file.name}`;
@@ -337,7 +344,7 @@ const VisaApply = () => {
         try {
           const snapshot = await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(snapshot.ref);
-  
+
           if (fileType === "certificate") {
             // Add the new URL to the certificate array
             updatedStudentDocument.certificate = [
@@ -348,24 +355,28 @@ const VisaApply = () => {
             // Replace the blob URL with the Firebase URL for non-certificate fields
             updatedStudentDocument[fileType] = downloadURL;
           }
-  
+
           const uploadData = {
             viewUrl: downloadURL,
             documentName: file.name,
             userId: studentId,
           };
           await uploadDocument(uploadData);
-  
+
           // Update state for dynamic updates
           setVisaLetter((prevState) => ({
             ...prevState,
             studentDocument: {
               ...prevState.studentDocument,
-              [fileType]: fileType === "certificate"
-                ? [...(prevState.studentDocument.certificate || []), downloadURL]
-                : prevState.studentDocument[fileType] === blobUrl
-                ? downloadURL
-                : prevState.studentDocument[fileType],
+              [fileType]:
+                fileType === "certificate"
+                  ? [
+                      ...(prevState.studentDocument.certificate || []),
+                      downloadURL,
+                    ]
+                  : prevState.studentDocument[fileType] === blobUrl
+                  ? downloadURL
+                  : prevState.studentDocument[fileType],
             },
           }));
         } catch (error) {
@@ -386,11 +397,13 @@ const VisaApply = () => {
             title: " AGENT_SUBMITTED_VISA_LODGEMENT",
             message: `${agentData?.companyDetails?.businessName} ${
               agentData?.agId
-            } has submitted the  Visa lodgment application ${res?.data?.applicationId} of ${countryName} for the student ${
+            } has submitted the  Visa lodgment application ${
+              res?.data?.applicationId
+            } of ${countryName} for the student ${
               studentData?.studentInformation?.personalInformation?.firstName +
               " " +
               studentData?.studentInformation?.personalInformation?.lastName
-            } ${ studentData?.studentInformation?.stId}`,
+            } ${studentData?.studentInformation?.stId}`,
             path: "/admin/applications-review",
 
             recieverId: "",
@@ -430,9 +443,7 @@ const VisaApply = () => {
       //   }
       // }
       if (role === "3") {
-        
         if (socketServiceInstance.isConnected()) {
-
           //from student to admin
           const notificationData = {
             title: " STUDENT_SUBMITTED_VISA_LODGEMENT",
@@ -444,7 +455,9 @@ const VisaApply = () => {
                 ?.lastName
             } ${
               studentInfoData?.data?.studentInformation?.stId
-            }  has submitted the course fee application ${res.data.applicationId}.  `,
+            }  has submitted the course fee application ${
+              res.data.applicationId
+            }.  `,
             agentId: agentData?._id,
             agId: agentData?.agId,
             agentName: agentData?.companyDetails?.businessName,
@@ -456,12 +469,7 @@ const VisaApply = () => {
               " " +
               studentInfoData?.data?.studentInformation?.personalInformation
                 ?.lastName,
-            countryName: "",
-            collegeName: "",
-            applicationId: "",
-            ticketId: "",
-            appId: "",
-            ticId: "",
+            path: "/admin/applications-review",
             recieverId: agentData?._id,
           };
 
@@ -469,7 +477,6 @@ const VisaApply = () => {
             "NOTIFICATION_STUDENT_TO_ADMIN",
             notificationData
           );
-
         } else {
           console.error("Socket connection failed, cannot emit notification.");
         }
@@ -641,8 +648,12 @@ const VisaApply = () => {
                 {docType
                   .replace(/([A-Z])/g, " $1")
                   .trim()
-                  .replace(/^./, (str) => str.toUpperCase()) } {docType === "pal" && countryName === "Germany" ? "*" : docType === "pal" ? "" : "*"}
-
+                  .replace(/^./, (str) => str.toUpperCase())}{" "}
+                {docType === "pal" && countryName === "Germany"
+                  ? "*"
+                  : docType === "pal"
+                  ? ""
+                  : "*"}
               </p>
               <div className="flex flex-col justify-center items-center border-2 border-dashed border-body rounded-md py-9 mt-5 mb-4">
                 <button
@@ -651,10 +662,13 @@ const VisaApply = () => {
                 >
                   <FiUpload className="mr-2 text-primary text-[29px]" />
                 </button>
-                <p>Upload   {docType
-                  .replace(/([A-Z])/g, " $1")
-                  .trim()
-                  .replace(/^./, (str) => str.toUpperCase())}</p>
+                <p>
+                  Upload{" "}
+                  {docType
+                    .replace(/([A-Z])/g, " $1")
+                    .trim()
+                    .replace(/^./, (str) => str.toUpperCase())}
+                </p>
               </div>
               {visaLetter.studentDocument[docType] && (
                 <div className="mt-2 flex items-center">
@@ -701,13 +715,12 @@ const VisaApply = () => {
         resetDoc={resetDoc}
         setResetDoc={setResetDoc}
         studentId={
-            role === "2"
-              ? studentId
-              : role === "3"
-              ? studentInfoData?.data?.studentInformation?._id
-              : null
-          }
-    
+          role === "2"
+            ? studentId
+            : role === "3"
+            ? studentInfoData?.data?.studentInformation?._id
+            : null
+        }
       />
 
       <PopUp
