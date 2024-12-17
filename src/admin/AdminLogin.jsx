@@ -7,9 +7,12 @@ import { adminLogin } from "../features/adminApi";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Mobile from "../components/Mobile";
+import { useDispatch } from "react-redux";
+import { adminProfileData } from "../features/adminSlice";
 
 const AdminLogin = () => {
     const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState({
     email: "",
     password: ""
@@ -67,15 +70,22 @@ const AdminLogin = () => {
       const role = "0";
       const { email, password } = isLogin;
       const res = await adminLogin(role, email, password);
-      
       toast.success(res.message || "Login Successful");
-      navigate("/admin/approvals")
+      navigate("/admin/dashboard")
+      dispatch(adminProfileData())
+
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin(e);
+    }
+  };
+  
 
   return (
     <>
@@ -100,11 +110,11 @@ const AdminLogin = () => {
               Login Your Account
             </p>
 
-            <span className="flex flex-col bg-white rounded-md md:w-[80vh] xl:w-[80vh] sm:w-[30vh] px-10 py-9 md:ml-20 mt-3">
+            <span className="flex flex-col bg-white rounded-md md:w-[45vh] lg:w-[80vh] xl:w-[80vh] sm:w-[30vh] px-10 py-9 md:ml-20 mt-3">
               <p className="text-secondary text-[18px] font-medium">
                 Login account as a admin
               </p>
-
+              <div onKeyDown={handleKeyDown} className="login-container">
               <span className="font-poppins">
                 <div>
                   <div className="mt-6 text-secondary">Email Id</div>
@@ -160,7 +170,7 @@ const AdminLogin = () => {
                     </div>
                   )}
                 </div>
-              </span>
+              </span></div>
             </span>
           </span>
         </div>

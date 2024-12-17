@@ -49,7 +49,7 @@ const authSlice = createSlice({
             state.userData = decodedToken; 
             state.userId = decodedToken?.id || decodedToken?._id; 
             localStorage.setItem("role", decodedToken?.role )
-            console.log("Decoded Token:", decodedToken); 
+   
           } else {
             state.error = "Invalid token format"; 
           }

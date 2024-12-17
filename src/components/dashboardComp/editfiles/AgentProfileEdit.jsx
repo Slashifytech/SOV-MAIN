@@ -13,7 +13,13 @@ import AgentForm5 from "./../../../agent/AgentForm5";
 import { FaBuildingFlag } from "react-icons/fa6";
 import AgentForm6 from "./../../../agent/AgentForm6";
 
-const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
+const AgentProfileEdit = ({
+  agentData,
+  locationPath,
+  updateData,
+  adminId,
+  agentId,
+}) => {
   const profileView = locationPath?.state?.isprofileView;
   const [toggleStates, setToggleStates] = useState({
     isOne: false,
@@ -148,7 +154,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isOne
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+                 ? "md:h-[100vh] lg:h-[130vh] sm:h-[87vh]  translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
@@ -158,6 +164,8 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}
+                adminId={adminId}
+                agentId={agentId}
               />
             </div>
           )}
@@ -310,16 +318,18 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isTwo
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+                ? "md:min-h-[70vh] lg:min-h-[100vh] sm:min-h-[60vh] translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
           {toggleStates.isTwo && (
             <div className="mt-4">
               <AgentForm2
+                adminId={adminId}
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}
+                agentId={agentId}
               />
             </div>
           )}
@@ -411,16 +421,18 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isThree
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+                              ? "md:h-[100vh] lg:h-[130vh] sm:h-[87vh]  translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
           {toggleStates.isThree && (
             <div className="mt-4">
               <AgentForm3
+                adminId={adminId}
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}
+                agentId={agentId}
               />
             </div>
           )}
@@ -577,6 +589,7 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
               )}
             </span>
           </span>
+
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">
               What type of Higher Education Programmes are your Customer
@@ -627,16 +640,18 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isFour
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+                ? "md:min-h-[80vh] lg:min-h-[100vh] sm:min-h-[60vh] translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
           {toggleStates.isFour && (
             <div className="mt-4">
               <AgentForm4
+                adminId={adminId}
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}
+                agentId={agentId}
               />
             </div>
           )}
@@ -717,16 +732,18 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isFive
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+                 ? "md:h-[70vh] lg:h-[100vh] sm:h-[72vh]  translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
           {toggleStates.isFive && (
             <div className="mt-4">
               <AgentForm5
+                adminId={adminId}
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}
+                agentId={agentId}
               />
             </div>
           )}
@@ -799,13 +816,15 @@ const AgentProfileEdit = ({ agentData, locationPath, updateData }) => {
         <div
           className={`transition-all duration-500 ease-in-out transform ${
             toggleStates.isSix
-              ? "min-h-[100vh] translate-y-0 opacity-100"
+              ? "md:min-h-[80vh] lg:min-h-[100vh] sm:min-h-[60vh] translate-y-0 opacity-100"
               : "max-h-0 -translate-y-10 opacity-0 overflow-hidden"
           }`}
         >
           {toggleStates.isSix && (
             <div className="mt-4">
               <AgentForm6
+                adminId={adminId}
+                agentId={agentId}
                 hide={true}
                 handleCancel={handleCancel}
                 updateData={updateData}

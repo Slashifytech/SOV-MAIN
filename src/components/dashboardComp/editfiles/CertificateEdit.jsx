@@ -11,11 +11,12 @@ import OfferLetterPop from "../OfferLetterPop";
 import { FiUpload } from "react-icons/fi";
 import { TbPencilMinus } from "react-icons/tb";
 import { FaFileUpload, FaRegEye } from "react-icons/fa";
-import { OfferLetterCertificate } from "../../../features/generalApi";
+import { deleteDocument, OfferLetterCertificate, uploadDocument } from "../../../features/generalApi";
 import { useSelector } from "react-redux";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { v4 as uuidv4 } from 'uuid';
-const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
+
+const CertificateEdit = ({ appId, updatedData, profileViewPath, userId }) => {
+
   const [offerLater, setOfferLater] = useState({
     certificate: { url: [] },
   });
@@ -52,33 +53,51 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     if (!files || files.length === 0) return;
   
     // Filter files to ensure no duplicates or deleted files are re-added
-    const uniqueFiles = files.filter(
-      (file) =>
-        !newFiles.some((existingFile) => existingFile.name === file.name) &&
-        !deletedFiles.some((deletedFileUrl) => deletedFileUrl.includes(file.name))
-    );
+    const uniqueFiles = files.filter((file) => {
+      const fileName = file.name || file.split('/').pop(); // Handle file objects or URLs
+      return (
+        !newFiles.some((existingFile) => existingFile.name === fileName) &&
+        !deletedFiles.some((deletedFileUrl) => deletedFileUrl.includes(fileName))
+      );
+    });
   
     if (uniqueFiles.length === 0) {
       toast.warn("Duplicate or previously deleted files are not allowed.");
       return;
     }
   
-    setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
+    // Check if the input contains URLs or File objects
+    const isFileObjects = uniqueFiles[0] instanceof File;
   
-    // Temporarily set blob URLs for preview
-    const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
-    setOfferLater((prevData) => ({
-      ...prevData,
-      certificate: {
-        url: [...prevData.certificate.url, ...blobUrls], // Append blob URLs
-      },
-    }));
+    if (isFileObjects) {
+      // Handle File objects
+      setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
+  
+      // Temporarily set blob URLs for preview
+      const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
+      setOfferLater((prevData) => ({
+        ...prevData,
+        certificate: {
+          url: [...prevData.certificate.url, ...blobUrls], // Append blob URLs
+        },
+      }));
+    } else {
+      // Handle URLs directly
+      setOfferLater((prevData) => ({
+        ...prevData,
+        certificate: {
+          url: [...prevData.certificate.url, ...uniqueFiles], // Append URLs
+        },
+      }));
+    }
+  
+  
   };
   
   
-  const deleteFile = (fileUrl) => {
+  const deleteFile = async(fileUrl) => {
     if (!fileUrl) return;
-  
+
     const isFirebaseUrl = fileUrl.startsWith("http");
   
     if (isFirebaseUrl) {
@@ -108,7 +127,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
   
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      toast.error("Form contains errors.");
+      toast.error("Please fill all required fields");
       return;
     }
   
@@ -116,27 +135,29 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
       setIsSubmitting(true);
   
       // Step 1: Delete files marked for deletion
-      for (const fileUrl of deletedFiles) {
-        const storageRef = ref(storage, fileUrl);
-        try {
-          await deleteObject(storageRef);
-          // toast.success(`File ${fileUrl} deleted successfully.`);
-        } catch (error) {
-          // toast.error(`Error deleting file: ${fileUrl}`);
-        }
-      }
+    //   for (const fileUrl of deletedFiles) {
+    //     const storageRef = ref(storage, fileUrl);
+    //     try {
+    //       await deleteObject(storageRef);
+    // await deleteDocument(fileUrl)
+
+    //       // toast.success(`File ${fileUrl} deleted successfully.`);
+    //     } catch (error) {
+    //       // toast.error(`Error deleting file: ${fileUrl}`);
+    //     }
+    //   }
   
       // Step 2: Upload new files if any
       let uploadedUrls = [];
       if (newFiles.length > 0) {
         for (const file of newFiles) {
-          const uniqueFileName = `${uuidv4()}-${file.name}`;
-          const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
+          const storageRef = ref(storage, `uploads/offerLetter/${file.name}`);
           try {
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
             uploadedUrls.push(downloadURL);
-  
+            const uploadData = { viewUrl: downloadURL, documentName: file.name, userId:userId };
+            await uploadDocument(uploadData);
             // Replace blob URLs with Firebase URLs in state
             setOfferLater((prevData) => ({
               ...prevData,
@@ -147,7 +168,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
               },
             }));
           } catch (error) {
-            toast.error(`Error uploading ${file.name}.`);
+            // toast.error(`Error uploading ${file.name}.`);
           }
         }
       }
@@ -187,7 +208,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
     if (applicationDataById) {
       setOfferLater({
         certificate: {
-          url: applicationDataById?.certificate?.url || [],
+          url: applicationDataById?.offerLetter?.certificate?.url || [],
         },
       });
     }
@@ -204,7 +225,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
               Certificate Details
             </span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath 
             ? ""
             : !isOne && (
                 <span
@@ -220,8 +241,8 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">IELTS/PTE/TOEFL/Certificate*</span>
             <span className="font-medium mt-2">
-            {applicationDataById?.certificate?.url?.length > 0 ? (
-  applicationDataById.certificate.url.map((url, index) => (
+            {applicationDataById?.offerLetter?.certificate?.url?.length > 0 ? (
+  applicationDataById.offerLetter.certificate.url.map((url, index) => (
     <a
       key={index} // Always add a key when mapping over an array
       className="flex items-center gap-3 text-primary font-medium"
@@ -304,7 +325,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
                 className="bg-primary text-white px-6 py-2 rounded"
                 onClick={handleSubmit}
               >
-                  {isSubmitting ? "Submitting..." : "Save"}
+                  {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
           )}
@@ -318,6 +339,7 @@ const CertificateEdit = ({ appId, updatedData, profileViewPath }) => {
           handleFileUpload={(files) => handleFileUpload(files, isFileType)}
           // handleDeleteFile={(fileUrl) => deleteFile(fileUrl, isFileType)}
           errors={errors}
+          studentId={userId}
           onSubmit={() => {
             console.log("Form Submitted");
           }}

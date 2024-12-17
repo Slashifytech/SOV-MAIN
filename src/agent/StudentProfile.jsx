@@ -12,10 +12,18 @@ import Loader from "../components/Loader";
 import { getStudentById } from "../features/adminSlice";
 import Sidebar from "../components/dashboardComp/Sidebar";
 import { studentInfo } from "../features/studentSlice";
+import VisaEdit from "./VisaEdit";
+import VisaStatusComponent from "../components/dashboardComp/VisaStatusComponent";
+import Applications from "./Applications";
+import ApplicationView from "./ApplicationView";
+import StudentuplaodDocument from "./../components/dashboardComp/StudentuplaodDocument";
+import StudentRecieveDocument from "../components/dashboardComp/StudentRecieveDocument";
+import AdminSidebar from "../components/dashboardComp/AdminSidebar";
+import TabBarTwo from "../components/TabBarTwo";
 
 const StudentProfile = () => {
   const role = localStorage.getItem("role");
-  const id = localStorage.getItem("student")
+  const id = localStorage.getItem("student");
   const { studentInfoData } = useSelector((state) => state.student);
 
   const studentData =
@@ -27,7 +35,12 @@ const StudentProfile = () => {
 
   const location = useLocation();
   const dispatch = useDispatch();
-  const studentId = role === "3" ? id : location?.state?.id;
+  console.log(location);
+  const studentId =
+    role === "3"
+      ? id || location.state.notifyId
+      : location?.state?.id || location?.state?.notifyId;
+
   const profileView = location.state?.isprofileView;
   const [isLoading, setIsLoading] = useState(true);
   const [profileUpdated, setProfileUpdated] = useState(false);
@@ -35,19 +48,17 @@ const StudentProfile = () => {
     if (role === "0") {
       dispatch(getStudentById(studentId));
     }
-     if(role === "3"){
-    dispatch(studentInfo(studentId));
-
-     }
+    if (role === "3") {
+      dispatch(studentInfo(studentId));
+    }
     dispatch(studentById(studentId));
   }, [dispatch, profileUpdated, studentId]);
 
   const handleProfileUpdate = () => {
-    console.log("changed")
     setProfileUpdated((prev) => !prev);
   };
 
-  const tabs = [
+  const allTabs = [
     {
       name: "profile",
       label: "Profile",
@@ -57,9 +68,64 @@ const StudentProfile = () => {
         profileView: profileView,
         updateData: handleProfileUpdate,
         studentId: studentId,
+        adminPath: location.state?.adminState,
+      },
+    },
+
+    {
+      name: "uploadDocument",
+      label: "Upload Document",
+      component: StudentuplaodDocument,
+      props: {
+        data: studentData?.studentInformation,
+        profileView: profileView,
+        updateData: handleProfileUpdate,
+        studentId: studentId,
+        adminPath: location.state?.adminState,
+      },
+    },
+    {
+      name: "recieveDocument",
+      label: "Recieve Document",
+      component: StudentRecieveDocument,
+      props: {
+        data: studentData?.studentInformation,
+        profileView: profileView,
+        updateData: handleProfileUpdate,
+        studentId: studentId,
+        adminPath: location.state?.adminState,
+      },
+    },
+    {
+      name: "applications",
+      label: "Applications",
+      component: ApplicationView,
+      props: {
+        data: studentData?.studentInformation,
+        profileView: profileView,
+        updateData: handleProfileUpdate,
+        stId: studentId,
+        adminPath: location.state?.adminState,
+        adminAccess: location?.state?.id,
+      },
+    },
+    {
+      name: "visaStatus",
+      label: "Visa Status",
+      component: VisaStatusComponent,
+      props: {
+        data: studentData?.studentInformation,
+        profileView: profileView,
+        updateData: handleProfileUpdate,
+        studentId: studentId,
+        adminPath: location.state?.adminState,
+        adminAccess: location?.state?.id,
       },
     },
   ];
+  console.log(location);
+  const tabs =
+    role === "3" ? allTabs.filter((tab) => tab.name === "profile") : allTabs;
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -68,6 +134,28 @@ const StudentProfile = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const statusFive =
+    studentData?.flags?.visaApproved === "approved" ||
+    studentData?.flags?.visaApproved === "approvedbyembassy" ||
+  studentData?.flags?.visaApproved === "withdrawalrequest" ||
+  studentData?.flags?.visaApproved === "withdrawalcomplete" ||
+  studentData?.flags?.visaApproved === "rejectedbyembassy"
+    ? "done"
+    : studentData?.flags?.visaApproved === "reject"
+    ? "pending"
+    : "current";
+
+  const statusSix =
+  
+    studentData?.flags?.visaApproved === "approvedbyembassy" ||
+    studentData?.flags?.visaApproved === "visagranted"
+      ? "done"
+      : 
+        studentData?.flags?.visaApproved === "rejectedbyembassy" ||
+        studentData?.flags?.visaApproved === "withdrawalrequest" ||
+        studentData?.flags?.visaApproved === "withdrawalcomplete"
+      ? "pending"
+      : "current";
   return (
     <>
       {profileView === "/admin/approvals" ||
@@ -82,13 +170,15 @@ const StudentProfile = () => {
                 <Sidebar />
               ) : role === "2" ? (
                 <AgentSidebar />
+              ) : role === "0" ? (
+                <AdminSidebar />
               ) : null}
             </span>
           </div>{" "}
         </>
       )}
       {isLoading ? (
-        <div className="w-1 ml-[50%] mt-52">
+        <div className="w-full ml-[50%] mt-52">
           <Loader />
         </div>
       ) : (
@@ -96,18 +186,33 @@ const StudentProfile = () => {
           <div>
             {profileView === "/admin/approvals" ||
             profileView === "/admin/applications-review" ||
+            role === "0" ||
+            location?.state?.adminState ||
             role === "3" ? (
               ""
             ) : (
               <div className="pt-20 md:ml-[17.5%] md:pl-0 sm:pl-[25%] bg-white">
                 <StatusComp
                   statusOne={
-                    studentData?.studentInformation?.pageCount === 3
+                    studentData?.studentInformation?.pageStatus?.status ===
+                    "completed"
                       ? "done"
                       : "pending"
                   }
-                  statusTwo={studentData?.flag ? "done" : "current"}
+                  statusTwo={
+                    studentData?.flags?.offerLetterApproved === "approved" ? "done" :   studentData?.flags?.offerLetterApproved === "rejected" ? "pending"  : "current"
+                  }
+                  statusFive={statusFive}
+                  statusFour={
+                    studentData?.flags?.courseFeeApproved === "approved"
+                      ? "done"
+                      : studentData?.flags?.courseFeeApproved === "rejected"
+                      ? "pending"
+                      : "current"
+                  }
+                  statusSix={statusSix}
                 />
+                {/* {console.log(studentData?.flags) } */}
               </div>
             )}
 
@@ -118,7 +223,9 @@ const StudentProfile = () => {
                   ? " mx-44 px-6 mt-10 pt-6 pb-10"
                   : role === "3"
                   ? "pt-20  pl-[19.5%] pb-6"
-                  : " pl-[19.5%] pt-10 pb-6"
+                  : location?.state?.adminState
+                  ? " pl-[19.5%] pt-20 pb-6"
+                  : `pl-[19.5%] ${role === "0" ? "pt-[75px] " : "pt-[25px]"} pb-6`
               }`}
             >
               <span>
@@ -134,10 +241,6 @@ const StudentProfile = () => {
                     loading="lazy"
                   />
                   <span className="flex flex-col">
-                    {/* <span className="text-primary font-medium text-[13px]">
-                      {studentData?.personalInformation?.applicationCount || 0}{" "}
-                      Applications
-                    </span> */}
                     <span className="text-sidebar text-[18px] font-medium ">
                       {studentData?.studentInformation?.personalInformation
                         ?.firstName +
@@ -160,8 +263,9 @@ const StudentProfile = () => {
                 </div>
               </span>
             </span>
-            <div className="sm:ml-[9%] md:ml-0">
-              <TabBar tabs={tabs} />
+
+            <div className="sm:ml-[9%] md:ml-0 ">
+              <TabBarTwo tabs={tabs} />
             </div>
           </div>
         </>

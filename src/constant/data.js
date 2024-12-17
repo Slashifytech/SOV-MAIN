@@ -1,7 +1,13 @@
-import {  AgentSignup1, AgentSignup2, AgentSignup3, icon1, icon2, icon3 } from "../assets";
+import {
+  AgentSignup1,
+  AgentSignup2,
+  AgentSignup3,
+  icon1,
+  icon2,
+  icon3,
+} from "../assets";
 
 export const studentSignUp = [
-
   {
     text: "Country, course & university selection",
     src: icon2,
@@ -9,13 +15,11 @@ export const studentSignUp = [
   {
     text: "Application & admission assistance",
     src: icon3,
-    
   },
   {
     text: "GIC Lodgement",
     src: icon3,
-  }
-
+  },
 ];
 export const agentSignUp = [
   {
@@ -39,9 +43,7 @@ export const hearAboutOption = [
   { id: 4, option: "friends", label: "Friends" },
   { id: 5, option: "others", label: "Others" },
 ];
-export const typeOfStudent = [
-  { value: "onCampus", label: "On Campus" },
-];
+export const typeOfStudent = [{ value: "onCampus", label: "On Campus" }];
 
 export const titleOption = [
   { id: 0, option: "mr", label: "Mr" },
@@ -55,12 +57,26 @@ export const maritalOption = [
   { id: 3, option: "widow", label: "Widow/Widower" },
 ];
 
+export const ticketTypeOption = [
+  { id: 0, option: "Application", label: "Application Issues" },
+  { id: 1, option: "Technical", label: "Technical Issues" },
+  { id: 3, option: "Financial", label: "Financial Issues" },
+  { id: 4, option: "Other", label: "Other Issues" },
+];
+export const priorityOption = [
+  { id: 0, option: "Normal", label: "Normal" },
+  { id: 1, option: "Urgent", label: "Urgent" },
+];
 export const educationLevelOption = [
   { id: 0, option: "10th/Metric", label: "10th/Metric" },
-  { id: 1, option: "12th/Secondary Education", label: "12th/Secondary Education" },
+  {
+    id: 1,
+    option: "12th/Secondary Education",
+    label: "12th/Secondary Education",
+  },
   { id: 2, option: "Diploma", label: "Diploma" },
-  { id: 3, option: "UG (Under Graduate)" , label: "UG (Under Graduate)" },
-  { id: 3, option: "PG (Post Graduate)" , label: "PG (Post Graduate)" },
+  { id: 3, option: "UG (Under Graduate)", label: "UG (Under Graduate)" },
+  { id: 3, option: "PG (Post Graduate)", label: "PG (Post Graduate)" },
 ];
 
 export const genderOption = [
@@ -117,44 +133,48 @@ export const licenceOption = [
 ];
 
 export const interestedProgramsOption = [
-  { id: 0, option: "diploma", label: "Diploma" },
+  { id: 0, option: "Diploma", label: "Diploma" },
   {
     id: 1,
-    option: "englishLanguagePreprations",
+    option: "English Language Preprations",
     label: "English Language Preprations",
   },
-  { id: 2, option: "foundation", label: "Foundation" },
-  { id: 3, option: "highSchool", label: "High School" },
-  { id: 4, option: "masters", label: "Masters" },
-  { id: 5, option: "preMastersProgramme", label: "Pre-Masters Programme" },
-  { id: 6, option: "undergraduate", label: "Undergraduate" },
+  { id: 2, option: "Foundation", label: "Foundation" },
+  { id: 3, option: "High School", label: "High School" },
+  { id: 4, option: "Masters", label: "Masters" },
+  { id: 5, option: "Pre Masters Programme", label: "Pre-Masters Programme" },
+  { id: 6, option: "Undergraduate", label: "Undergraduate" },
 ];
 export const sourceOfFinanceOption = [
-  { id: 0, option: "family", label: "Family" },
-  { id: 1, option: "selfFundingSponsered", label: "Self Funding Sponsered" },
-  { id: 2, option: "studyLoans", label: "Study Loans" },
-  { id: 3, option: "others", label: "Others" },
+  { id: 0, option: "Family", label: "Family" },
+  { id: 1, option: "Self Funding Sponsered", label: "Self Funding Sponsered" },
+  { id: 2, option: "Study Loans", label: "Study Loans" },
+  { id: 3, option: "Others", label: "Others" },
 ];
 export const interestedDestinationOption = [
-  { id: 0, option: "australia&newZeeland", label: "Australia & New Zeeland" },
-  { id: 1, option: "uk&Europe", label: "UK & Europe" },
-  { id: 2, option: "usa&Canada", label: "USA & Canada" },
+  {
+    id: 0,
+    option: "Australia & New Zeeland",
+    label: "Australia & New Zeeland",
+  },
+  { id: 1, option: "Uk & Europe", label: "UK & Europe" },
+  { id: 2, option: "USA & Canada", label: "USA & Canada" },
 ];
 
 export const advertiseOption = [
-  { id: 0, option: "onlineAndMobileAds", label: "Online and Mobile ads" },
-  { id: 1, option: "printedPublications", label: "Printed Publications" },
-  { id: 2, option: "studentEvents", label: "Student Events" },
-  { id: 3, option: "highSchool", label: "High School" },
+  { id: 0, option: "Online and Mobile ads", label: "Online and Mobile ads" },
+  { id: 1, option: "Printed Publications", label: "Printed Publications" },
+  { id: 2, option: "Student Events", label: "Student Events" },
+  { id: 3, option: "High School", label: "High School" },
 ];
 
 export const socialMediaOption = [
-  { id: 0, option: "facebook", label: "Facebook" },
-  { id: 1, option: "line", label: "Line" },
-  { id: 2, option: "twitter", label: "Twitter" },
-  { id: 3, option: "weChat", label: "We Chat" },
-  { id: 4, option: "linkedIn", label: "LinkedIn" },
-  { id: 5, option: "instagram", label: "Instagram" },
+  { id: 0, option: "Facebook", label: "Facebook" },
+  { id: 1, option: "Line", label: "Line" },
+  { id: 2, option: "Twitter", label: "Twitter" },
+  { id: 3, option: "We Chat", label: "We Chat" },
+  { id: 4, option: "LinkedIn", label: "LinkedIn" },
+  { id: 5, option: "Instagram", label: "Instagram" },
 ];
 
 export const referenceOptions = [
@@ -185,14 +205,33 @@ export const regTypeOption = [
   { id: 2, option: "Corporation", label: "Corporation" },
 ];
 export const applicationTypeOption = [
-  { id: 0, option: "offerLetter", label: "Offer Letter" },
-  { id: 1, option: "courseFeeApplication", label: "Course Fee Application" },
+  { id: 0, option: "offerletter", label: "Offer Letter" },
+  { id: 1, option: "coursefeeApplication", label: "Course Fee Application" },
   { id: 2, option: "visa", label: "Visa" },
 ];
 export const statusOption = [
   { id: 0, option: "underreview", label: "Under Review" },
   { id: 1, option: "approved", label: "Approved" },
   { id: 2, option: "rejected", label: "Rejected" },
+];
+export const statusApplicationView = [
+  { id: 0, option: "underreview", label: "Under Review" },
+  { id: 1, option: "approved", label: "Approved" },
+  { id: 2, option: "rejected", label: "Rejected" },
+];
+export const statusTicketOption = [
+  { id: 0, option: "underreview", label: "Under Review" },
+  { id: 1, option: "resolved", label: "Resolved" },
+];
+export const appType = [
+  { id: 0, option: "offerLetter", label: "Offer Letter" },
+  { id: 0, option: "courseFeeApplication", label: "Course Fee" },
+  { id: 1, option: "visa", label: "Visa" },
+];
+
+export const userType = [
+  { id: 0, option: "agent", label: "Agent" },
+  { id: 0, option: "student", label: "Student" },
 ];
 export const intakeOption = [
   { id: 0, option: "Jan 2025", label: "Jan 2025" },
@@ -209,4 +248,36 @@ export const intakeOption = [
   { id: 11, option: "Dec 2027", label: "Dec 2027" },
 ];
 
-  
+export const donoughtFilter = [
+  { id: 0, option: "11 2024", label: "Nov 2024", year: 2024, month: "November" },
+  { id: 1, option: "12 2024", label: "Dec 2024", year: 2024, month: "December" },
+  { id: 2, option: "1 2025", label: "Jan 2025", year: 2025, month: "January" },
+  { id: 3, option: "2 2025", label: "Feb 2025", year: 2025, month: "February" },
+  { id: 4, option: "3 2025", label: "Mar 2025", year: 2025, month: "March" },
+  { id: 5, option: "4 2025", label: "Apr 2025", year: 2025, month: "April" },
+  { id: 6, option: "5 2025", label: "May 2025", year: 2025, month: "May" },
+  { id: 7, option: "6 2025", label: "Jun 2025", year: 2025, month: "June" },
+  { id: 8, option: "7 2025", label: "Jul 2025", year: 2025, month: "July" },
+  { id: 9, option: "8 2025", label: "Aug 2025", year: 2025, month: "August" },
+  {
+    id: 10,
+    option: "9 2025",
+    label: "Sep 2025",
+    year: 2025,
+    month: "September",
+  },
+  {
+    id: 11,
+    option: "10 2025",
+    label: "Oct 2025",
+    year: 2025,
+    month: "October",
+  },
+  {
+    id: 12,
+    option: "11 2025",
+    label: "Nov 2025",
+    year: 2025,
+    month: "November",
+  },
+];

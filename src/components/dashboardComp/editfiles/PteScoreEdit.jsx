@@ -106,11 +106,11 @@ const PteScoreEdit = ({ appId, updatedData, profileViewPath}) => {
     if (applicationDataById) {
       setOfferLater({
         PTE: {
-          reading: applicationDataById?.ptes?.reading || "",
-          speaking: applicationDataById?.ptes?.speaking || "",
-          writing: applicationDataById?.ptes?.writing || "",
-          listening: applicationDataById?.ptes?.listening || "",
-          overallBand: applicationDataById?.ptes?.overallBand || "",
+          reading: applicationDataById?.offerLetter?.ptes?.reading || "",
+          speaking: applicationDataById?.offerLetter?.ptes?.speaking || "",
+          writing: applicationDataById?.offerLetter?.ptes?.writing || "",
+          listening: applicationDataById?.offerLetter?.ptes?.listening || "",
+          overallBand: applicationDataById?.offerLetter?.ptes?.overallBand || "",
         },
       });
     } else {
@@ -172,7 +172,7 @@ const PteScoreEdit = ({ appId, updatedData, profileViewPath}) => {
             </span>
             <span className="font-semibold text-[22px]">PTE Score</span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath
             ? ""
             : !isOne && (
                 <span
@@ -189,26 +189,26 @@ const PteScoreEdit = ({ appId, updatedData, profileViewPath}) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Reading</span>
             <span className="font-medium">
-              {applicationDataById?.ptes?.reading || "NA"}
+              {applicationDataById?.offerLetter?.ptes?.reading || "NA"}
             </span>
             <span className="font-light mt-4">Writing</span>
             <span className="font-medium">
-              {applicationDataById?.ptes?.writing || "NA"}
+              {applicationDataById?.offerLetter?.ptes?.writing || "NA"}
             </span>
             <span className="font-light mt-4">Overall Bands</span>
             <span className="font-medium">
-              {applicationDataById?.ptes?.overallBand || "NA"}
+              {applicationDataById?.offerLetter?.ptes?.overallBand || "NA"}
             </span>
           </span>
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Speaking</span>
             <span className="font-medium">
-              {applicationDataById?.ptes?.speaking || "NA"}
+              {applicationDataById?.offerLetter?.ptes?.speaking || "NA"}
             </span>
 
             <span className="font-light mt-4">Listening</span>
             <span className="font-medium">
-              {applicationDataById?.ptes?.listening || "NA"}
+              {applicationDataById?.offerLetter?.ptes?.listening || "NA"}
             </span>
           </span>
         </div>
@@ -240,7 +240,7 @@ const PteScoreEdit = ({ appId, updatedData, profileViewPath}) => {
                   className="bg-primary text-white px-6 py-2 rounded"
                   onClick={handleSubmit}
                 >
-                  Save
+                  Submit
                 </button>
               </div>
             </>

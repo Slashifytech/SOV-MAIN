@@ -29,7 +29,10 @@ import { getStudentData, studentInfo } from "../features/studentSlice";
 import ImageComponent from "./../components/reusable/Input";
 import { ImBin } from "react-icons/im";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import { deleteDocument, uploadDocument } from "../features/generalApi";
+import { getStudentById } from "../features/adminSlice";
+import { editStudentAdmin } from "../features/adminApi";
 const Form1 = ({
   customClass,
   hide,
@@ -37,23 +40,33 @@ const Form1 = ({
   studentFormId,
   updateData,
 }) => {
-  const { countryOption } = useSelector((state) => state.general);
+  const role = localStorage.getItem("role");
   const location = useLocation();
+  const navigate = useNavigate();
+  const { getStudentDataById } = useSelector((state) => state.admin);
+  const { countryOption } = useSelector((state) => state.general);
   const studentInfoData = useSelector((state) => state.student.studentInfoData);
   const studentData = useSelector((state) => state.student.studentInformation);
   const IdToAddStudent = location?.state?.id?.id; // for comppleting pending student profile to get data if exists
   const studentInformation = hide ? studentInfoData : studentData;
   // console.log(studentInformation, IdToAddStudent);
-  const navigate = useNavigate();
   const [resetProfilePic, setResetProfilePic] = useState(false);
   const [resetPassportUpload, setResetPassportUpload] = useState(false);
-  const studentId = IdToAddStudent ||  studentFormId ||  localStorage.getItem("form") || studentInformation?.data?.studentInformation?._id;
+  const studentId =
+    IdToAddStudent ||
+    studentFormId ||
+    localStorage.getItem("form") ||
+    studentInformation?.data?.studentInformation?._id;
   const personalInfo =
-    studentInformation?.data?.studentInformation?.personalInformation;
+    role === "0"
+      ? getStudentDataById?.studentInformation?.personalInformation
+      : studentInformation?.data?.studentInformation?.personalInformation;
 
   const dispatch = useDispatch();
   const passportInfo =
-    studentInformation?.data?.studentInformation?.passportDetails;
+    role === "0"
+      ? getStudentDataById?.studentInformation?.passportDetails
+      : studentInformation?.data?.studentInformation?.passportDetails;
   const editForm = hide === true ? "edit" : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [personalData, setPersonalData] = useState({
@@ -79,7 +92,7 @@ const Form1 = ({
       countryOfCitizenship: "",
     },
   });
-  const [newFiles, setNewFiles] = useState([]); 
+  const [newFiles, setNewFiles] = useState([]);
   const [deletedFiles, setDeletedFiles] = useState([]);
   const [errors, setErrors] = useState({});
 
@@ -126,6 +139,9 @@ const Form1 = ({
   useEffect(() => {
     if (hide === true) {
       dispatch(studentInfo(studentFormId));
+      if (role === "0") {
+      dispatch(getStudentById(studentFormId));
+      }
     }
     if (hide === false) {
       dispatch(getStudentData(studentId));
@@ -178,23 +194,26 @@ const Form1 = ({
 
   const handleFileUpload = (files, uploadType) => {
     if (!files || files.length === 0) return;
-  
+
     const uniqueFiles = files.filter(
       (file) =>
         !newFiles.some((existingFile) => existingFile.name === file.name) &&
-        !deletedFiles.some((deletedFileUrl) => deletedFileUrl.includes(file.name)) &&
-        (uploadType !== "profilePicture" || file.name !== personalData.personalInformation.profilePicture)
+        !deletedFiles.some((deletedFileUrl) =>
+          deletedFileUrl.includes(file.name)
+        ) &&
+        (uploadType !== "profilePicture" ||
+          file.name !== personalData.personalInformation.profilePicture)
     );
-  
+
     if (uniqueFiles.length === 0) {
       toast.warn("Duplicate or previously deleted files are not allowed.");
       return;
     }
-  
+
     setNewFiles((prevState) => [...prevState, ...uniqueFiles]);
-  
+
     const blobUrls = uniqueFiles.map((file) => URL.createObjectURL(file));
-  
+
     if (uploadType === "profilePicture") {
       setPersonalData((prevData) => ({
         ...prevData,
@@ -216,29 +235,33 @@ const Form1 = ({
       });
     }
   };
-  
-  
+
   //delete image and file from firebase
 
-  const deleteFile = (fileUrl, uploadType) => {
+  const deleteFile = async (fileUrl, uploadType) => {
     if (!fileUrl) return;
-  
+    // await deleteDocument(fileUrl);
+
     const isFirebaseUrl = fileUrl.startsWith("http");
-  
+
     setPersonalData((prevData) => {
       if (uploadType === "passportUpload") {
-        const passportUpload = Array.isArray(prevData?.passportDetails?.passportUpload)
+        const passportUpload = Array.isArray(
+          prevData?.passportDetails?.passportUpload
+        )
           ? prevData.passportDetails.passportUpload
           : prevData.passportDetails.passportUpload
           ? prevData.passportDetails.passportUpload.split(",")
           : [];
-  
-        const updatedPassportUpload = passportUpload.filter((url) => url !== fileUrl);
-  
+
+        const updatedPassportUpload = passportUpload.filter(
+          (url) => url !== fileUrl
+        );
+
         if (isFirebaseUrl) {
           setDeletedFiles((prevState) => [...prevState, fileUrl]);
         }
-  
+
         return {
           ...prevData,
           passportDetails: {
@@ -247,7 +270,7 @@ const Form1 = ({
           },
         };
       }
-  
+
       if (uploadType === "profilePicture") {
         return {
           ...prevData,
@@ -257,10 +280,10 @@ const Form1 = ({
           },
         };
       }
-  
+
       return prevData;
     });
-  
+
     // toast.info("File has been marked for deletion.");
   };
 
@@ -279,9 +302,8 @@ const Form1 = ({
         passportDetails: {
           passportNumber: passportInfo?.passportNumber || "",
           expireDate: passportInfo?.expireDate || "",
-          passportUpload: passportInfo?.passportUpload
-          ? passportInfo.passportUpload.split(",") // Convert string to array
-          : [],
+          passportUpload: passportInfo?.passportUpload,
+
           countryOfCitizenship: passportInfo?.countryOfCitizenship || "",
         },
       }));
@@ -290,28 +312,28 @@ const Form1 = ({
 
   const handleSubmit = async () => {
     const validationErrors = validateFields();
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       toast.error("Form contains errors.");
       return;
     }
-  
+
     try {
       // Handle deletions
       for (const fileUrl of deletedFiles) {
         const storageRef = ref(storage, fileUrl);
         try {
           await deleteObject(storageRef);
-          console.log("deltetd")
+          console.log("deltetd");
         } catch (error) {
           console.error(`Error deleting file: ${fileUrl}`);
         }
       }
-  
+
       let profilePictureUrl = personalData.personalInformation.profilePicture;
       let updatedPassportUpload = personalData.passportDetails.passportUpload;
-  
+
       for (const file of newFiles) {
         // const storageRef = ref(storage, `uploads/student/${file.name}`);
         const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_"); // Sanitize file name
@@ -323,9 +345,14 @@ const Form1 = ({
           setIsSubmitting(true);
           const snapshot = await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(snapshot.ref);
-  
+
           if (file.type === "image/jpeg" || file.type === "image/png") {
             profilePictureUrl = downloadURL;
+            const uploadData = {
+              viewUrl: downloadURL,
+              documentName: file.name,
+            };
+            await uploadDocument(uploadData);
             setPersonalData((prevData) => ({
               ...prevData,
               personalInformation: {
@@ -335,19 +362,22 @@ const Form1 = ({
             }));
           } else {
             updatedPassportUpload = Array.isArray(updatedPassportUpload)
-            ? [...updatedPassportUpload, downloadURL]
-            : [downloadURL];
+              ? [...updatedPassportUpload, downloadURL]
+              : [downloadURL];
           }
         } catch (error) {
           toast.error(`Error uploading ${file.name}.`);
         }
       }
-      if (!newFiles.length && Array.isArray(personalData.passportDetails.passportUpload)) {
+      if (
+        !newFiles.length &&
+        Array.isArray(personalData.passportDetails.passportUpload)
+      ) {
         updatedPassportUpload = personalData.passportDetails.passportUpload;
       }
       const passportUploadString = Array.isArray(updatedPassportUpload)
-      ? updatedPassportUpload.join(",")
-      : updatedPassportUpload;
+        ? updatedPassportUpload.join(",")
+        : updatedPassportUpload;
       const payload = {
         personalInformation: {
           ...personalData.personalInformation,
@@ -359,19 +389,34 @@ const Form1 = ({
         },
         passportDetails: {
           ...personalData.passportDetails,
-          passportUpload: passportUploadString, 
+          passportUpload: passportUploadString,
         },
       };
-  
+
       // Step 4: Submit the data
-      const res = (hide || location?.state?.hide === true || studentInformation?.data?.studentInformation?.pageStatus?.status === "rejected" || studentInformation?.data?.studentInformation?.pageStatus?.status === "registering")
-        ? await StudentPersnalInfoEdit(payload, studentId)
-        : await StudentPersnalInfo(payload);
-  
+      const res =
+        role === "0"
+          ? await editStudentAdmin(
+              `/studentInformation/personal-information-admin/${studentId}`,
+              payload
+            )
+          : hide ||
+            location?.state?.hide === true ||
+            studentInformation?.data?.studentInformation?.pageStatus?.status ===
+              "rejected" ||
+            studentInformation?.data?.studentInformation?.pageStatus?.status ===
+              "registering"
+          ? await StudentPersnalInfoEdit(payload, studentId)
+          : await StudentPersnalInfo(payload);
+      if (role === "0") {
+        dispatch(getStudentById(studentId));
+      }
       if (res?.statusCode === 201 || res?.statusCode === 200) {
         toast.success("Personal Information Submitted successfully");
-        hide ? updateData() : navigate(`/student-form/2`, { state: "passPage" });
-  
+        hide
+          ? updateData()
+          : navigate(`/student-form/2`, { state: "passPage" });
+
         // Clear temporary states
         setNewFiles([]);
         setDeletedFiles([]);
@@ -390,6 +435,7 @@ const Form1 = ({
       toast.error(error?.message || "Something went wrong.");
     }
   };
+
   return (
     <div className="min-h-screen]">
       <div className={`${customClass}`}>
@@ -587,35 +633,41 @@ const Form1 = ({
 
           {/* Show uploaded documents */}
           {personalData.passportDetails.passportUpload && (
-  <div className="mt-4">
-    <p className="text-secondary font-semibold">Uploaded Documents:</p>
-    <ul>
-      {(Array.isArray(personalData.passportDetails.passportUpload)
-        ? personalData.passportDetails.passportUpload
-        : personalData.passportDetails.passportUpload.split(",") // Convert string to array
-      )
-        .filter((url) => typeof url === "string" && (url.startsWith("http") || url.startsWith("blob:"))) // Include blob URLs
-        .map((url, index) => (
-          <li key={index} className="flex items-center mt-2">
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary rounded-sm px-6 py-2 border border-greyishtext-primary"
-            >
-              Uploaded Passport
-            </a>
-            <button
-              onClick={() => deleteFile(url, "passportUpload")}
-              className="ml-4 text-red-500 test-[21px]"
-            >
-              <RiDeleteBin6Line />
-            </button>
-          </li>
-        ))}
-    </ul>
-  </div>
-)}
+            <div className="mt-4">
+              <p className="text-secondary font-semibold">
+                Uploaded Documents:
+              </p>
+              <ul>
+                {(Array.isArray(personalData.passportDetails.passportUpload)
+                  ? personalData.passportDetails.passportUpload
+                  : personalData.passportDetails.passportUpload.split(",")
+                ) // Convert string to array
+                  .filter(
+                    (url) =>
+                      typeof url === "string" &&
+                      (url.startsWith("http") || url.startsWith("blob:"))
+                  ) // Include blob URLs
+                  .map((url, index) => (
+                    <li key={index} className="flex items-center mt-2">
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary rounded-sm px-6 py-2 border border-greyishtext-primary"
+                      >
+                        Uploaded Passport
+                      </a>
+                      <button
+                        onClick={() => deleteFile(url, "passportUpload")}
+                        className="ml-4 text-red-500 test-[21px]"
+                      >
+                        <RiDeleteBin6Line />
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
 
           <CountrySelect
             name="passportDetails.countryOfCitizenship"
@@ -661,10 +713,9 @@ const Form1 = ({
               className="bg-primary text-white px-6 py-2 rounded"
               onClick={() => {
                 handleSubmit();
-             
               }}
             >
-            {isSubmitting ? "Submitting..." : "Save"}
+              {isSubmitting ? "Submitting..." : "Save"}
             </button>
           </div>
         ) : (

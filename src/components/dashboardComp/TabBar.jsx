@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
-const TabBar = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0].name); // Initialize with the first tab
+const TabBar = ({ tabs, activeTab, onTabChange  }) => {
+  // const [activeTab, setActiveTab] = useState(tabs[0].name); // Initialize with the first tab
+  console.log(tabs, "check")
 
-  const handleTabClick = (tabName) => {
-    setActiveTab(tabName);
-  };
+  // const handleTabClick = (tabName) => {
+  //   setActiveTab(tabName);
+  // };
+  
   return (
     <div>
       {/* Tab Bar */}
@@ -16,8 +18,8 @@ const TabBar = ({ tabs }) => {
           tab?.props?.profileView === "/admin/applications-review" ? null : (
             <button
               key={tab.name}
-              onClick={() => handleTabClick(tab.name)}
-              className={`py-2 px-4 focus:outline-none ${
+              onClick={() => onTabChange(tab.name)}
+              className={`py-2 md:px-4   px-2 focus:outline-none ${
                 activeTab === tab.name
                   ? "border-b-2 border-primary"
                   : "text-gray-500"
@@ -43,6 +45,9 @@ const TabBar = ({ tabs }) => {
             {activeTab === tab.name ? (
               <tab.component key={tab.name} {...tab.props}   />     
             ) : null}
+            {console.log(tab, "check")}
+            {/* console.log(data, "check") */}
+
           </div>
         ))}
       </>

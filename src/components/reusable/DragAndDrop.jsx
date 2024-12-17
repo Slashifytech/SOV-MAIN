@@ -204,7 +204,7 @@ const FileUpload = ({
               <FiUpload />
             </div>
             <span className="text-primary mt-4 font-medium ">
-              Delete to upload a new image
+              Delete to upload a new file
             </span>
           </div>
         ) : (

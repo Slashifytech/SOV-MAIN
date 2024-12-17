@@ -6,7 +6,7 @@ import generalReducer from "./generalSlice";
 import authReducer from "./authSlice";
 import agentReducer from "./agentSlice"
 import adminReducer from "./adminSlice";
-
+import notificationsReducer from "./notificationSlice"
 export const store = configureStore({
   reducer: {
     stepper: stepperReducer,
@@ -15,6 +15,7 @@ export const store = configureStore({
     auth: authReducer,
     agent: agentReducer,
     admin: adminReducer,
+    notifications: notificationsReducer,
   },
 
   //   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),

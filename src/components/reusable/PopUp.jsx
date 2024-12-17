@@ -15,9 +15,15 @@ const PopUp = ({
   const role = localStorage.getItem("role");
   const handleNavigate = () => {
     {
-      heading === "Offer Letter Form Submitted" && role === "2"
+      (heading === "Offer Letter Form Submitted" ||
+        heading === "Visa Form Submitted" ||
+        heading === "Course Fee Form Submitted") &&
+      role === "2"
         ? navigate("/agent/applications")
-        : heading === "Offer Letter Form Submitted" && role === "3"
+        : (heading === "Offer Letter Form Submitted" ||
+            heading === "Visa Form Submitted" ||
+            heading === "Course Fee Form Submitted") &&
+          role === "3"
         ? navigate("/student/dashboard")
         : heading === "Successfully Registered" && role === "2"
         ? navigate("/agent/student-lists")
@@ -58,9 +64,15 @@ const PopUp = ({
                 }}
                 className="px-8 py-2 cursor-pointer rounded-lg text-white bg-primary"
               >
-                {heading === "Offer Letter Form Submitted" && role === "2"
+                {(heading === "Offer Letter Form Submitted" ||
+                  heading === "Visa Form Submitted" ||
+                  heading === "Course Fee Form Submitted") &&
+                role === "2"
                   ? "Back to Applications"
-                  : heading === "Offer Letter Form Submitted" && role === "3"
+                  : (heading === "Offer Letter Form Submitted" ||
+                      heading === "Visa Form Submitted" ||
+                      heading === "Course Fee Form Submitted") &&
+                    role === "3"
                   ? "Back to Dashboard"
                   : heading === "Successfully Registered" && role === "2"
                   ? "Back to Lists"

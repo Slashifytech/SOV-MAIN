@@ -10,31 +10,38 @@ import Approved from "../components/adminComps/Approved";
 import Rejected from "../components/adminComps/Rejected";
 import Pagination from "../components/dashboardComp/Pagination";
 import { applicationForApproval } from "../features/adminSlice";
+import { uploadApplications } from "../features/adminApi";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const ApplicationReview = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
+  const location = useLocation();
   const { applications } = useSelector((state) => state.admin);
   const { updateState, tabType } = useSelector((state) => state.admin);
   const [search, setSearch] = useState("");
   const [perPage, setPerPage] = useState(10);
   const [isTypeFilter, setIsFilterType] = useState("")
   const [page, setPage] = useState(1);
-  const totalUsersCount = applications?.totalRecords || 0;
+  const totalUsersCount = applications?.total || 0;
   const currentPage = applications?.currentPage;
   const totalPagesCount = applications?.totalPages;
-
+ 
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "pending");
   const handlePageChange = (pageNumber) => {
     setPage(pageNumber);
   };
 
-  const handlePerPageChange = (e) => {
-    setPerPage(parseInt(e.target.value));
-    setPage(1);
-  };
-  const handleTypeFilter = (e) =>{
-    setIsFilterType(e.target.value)
-    setPage(1);
-  }
+  // const handlePerPageChange = (e) => {
+  //   setPerPage(parseInt(e.target.value));
+  //   setPage(1);
+  // };
+  
+  // const handleTypeFilter = (e) =>{
+  //   setIsFilterType(e.target.value)
+  //   setPage(1);
+  // }
+
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(1);
@@ -46,8 +53,10 @@ const ApplicationReview = () => {
   }
   useEffect(() => {
     if(tabType === "underreview" || tabType === "approved" || tabType === "rejected"){
+
     dispatch(applicationForApproval({tabType, page, perPage, search, isTypeFilter}));
     }
+
   }, [page, perPage, updateState, tabType, search, isTypeFilter]);
 
   const tabs = [
@@ -70,6 +79,22 @@ const ApplicationReview = () => {
       props: { data: applications },
     },
   ];
+  useEffect(() => {
+    // Check the pathname and reset the active tab if needed
+    if (location.pathname !== "/admin/applications-review") {
+      setActiveTab("pending");
+      setSearchParams({ tab: "pending" }); // Update the search params
+    } else {
+      setActiveTab(searchParams.get("tab") || "pending"); // Set from search params
+    }
+  }, [location.pathname, searchParams]);
+
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    setSearchParams({ tab: tabName });
+    setPage(1);
+
+  };
   return (
     <>
       <Header customLink="/agent/shortlist" />
@@ -93,7 +118,7 @@ const ApplicationReview = () => {
       </div>
       <span className="flex flex-row items-center mb-3 m-6 mt-6 sm:ml-[27%] md:ml-[19%] ">
         {" "}
-        <span className="text-body">Show</span>
+        {/* <span className="text-body">Show</span>
         <select
           className="ml-3 border px-2 py-1 w-10 h-11 rounded outline-none"
           value={perPage}
@@ -105,7 +130,7 @@ const ApplicationReview = () => {
             </option>
           ))}
         </select>
-        <span className="px-3 text-body">entries</span>
+        <span className="px-3 text-body">entries</span> */}
         {/* <select
           className="ml-3 border px-2 py-1 w-40 h-11 rounded outline-none"
            onChange={handleTypeFilter}
@@ -117,9 +142,9 @@ const ApplicationReview = () => {
           <option value="student">Student</option>
           <option value="company">Agent</option>
         </select> */}
-        <span className="flex flex-row items-center ml-9">
+        <span className="flex flex-row items-center ">
           <CustomInput
-            className="h-11 md:w-80 sm:w-48 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
+            className="h-11 md:w-80 sm:w-80 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
             type="text"
             placeHodler="Search by User Name & Application Id "
             name="search"
@@ -132,18 +157,19 @@ const ApplicationReview = () => {
         </span>
       </span>
       <div className="sm:ml-14 md:ml-0">
-        <TabBar tabs={tabs} />
+      <TabBar tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} setActiveTab={setActiveTab} />
       </div>
+{applications?.applications  ?  
 
-      <div className="mt-12 mb-10">
+      <div className="mt-12 mb-10 ml-36 ">
         <Pagination
-          currentPage={currentPage}
-          hasNextPage={currentPage * perPage < totalUsersCount}
-          hasPreviousPage={currentPage > 1}
-          onPageChange={handlePageChange}
-          totalPagesCount={totalPagesCount}
+           currentPage={currentPage}
+              hasNextPage={currentPage * perPage < totalUsersCount}
+              hasPreviousPage={currentPage > 1}
+              onPageChange={handlePageChange}
+              totalPagesCount={totalPagesCount}
         />
-      </div>
+      </div> : null}
     </>
   );
 };

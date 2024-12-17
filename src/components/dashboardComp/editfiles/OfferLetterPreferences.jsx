@@ -105,12 +105,12 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
     if (applicationDataById) {
       setOfferLater({
         preferences: {
-          course: applicationDataById?.preferences?.course || "",
-          intake: applicationDataById?.preferences?.intake || "",
-          institution: applicationDataById?.preferences?.institution || "",
-          country: applicationDataById?.preferences?.country || "",
-          // offerLetterPrice:
-          //   applicationDataById?.preferences?.offerLetterPrice || "",
+          course: applicationDataById?.offerLetter?.preferences?.course || "",
+          intake: applicationDataById?.offerLetter?.preferences?.intake || "",
+          institution: applicationDataById?.offerLetter?.preferences?.institution || "",
+          country: applicationDataById?.offerLetter?.preferences?.country || "",
+          offerLetterPrice:
+            applicationDataById?.offerLetter?.preferences?.offerLetterPrice || "",
         },
       });
     }
@@ -146,7 +146,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
           </span>
           <span className="font-semibold text-[22px]">Preferences</span>
         </span>
-        {profileViewPath === "/admin/applications-review"
+        {profileViewPath 
           ? ""
           : !isOne && (
               <span
@@ -162,26 +162,26 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
         <span className="w-1/2 flex flex-col text-[15px]">
           <span className="font-light">Country </span>
           <span className="font-medium">
-            {applicationDataById?.preferences?.country || "NA"}
+            {applicationDataById?.offerLetter?.preferences?.country || "NA"}
           </span>
           <span className="font-light mt-4">Course</span>
           <span className="font-medium">
-            {applicationDataById?.preferences?.course || "NA"}
+            {applicationDataById?.offerLetter?.preferences?.course || "NA"}
           </span>
           <span className="font-light mt-4">Intake</span>
           <span className="font-medium">
-            {applicationDataById?.preferences?.intake || "NA"}
+            {applicationDataById?.offerLetter?.preferences?.intake || "NA"}
           </span>
         </span>
         <span className="w-1/2 flex flex-col text-[15px]">
           <span className="font-light mt-4">Institution</span>
           <span className="font-medium">
-            {applicationDataById?.preferences?.institution || "NA"}
+            {applicationDataById?.offerLetter?.preferences?.institution || "NA"}
           </span>
-          {/* <span className="font-light mt-4">Offer Letter Price</span>
+          <span className="font-light mt-4">Offer Letter Price</span>
           <span className="font-medium">
-            {applicationDataById?.preferences?.offerLetterPrice || "NA"}
-          </span> */}
+            {applicationDataById?.offerLetter?.preferences?.offerLetterPrice || "NA"}
+          </span>
         </span>
       </div>
       <div
@@ -229,7 +229,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
             {errors.prefCourse && (
               <p className="text-red-500 mt-1 text-sm">{errors.prefCourse}</p>
             )}
-{/* 
+
             <Register
               imp="*"
               name="preferences.offerLetterPrice"
@@ -239,7 +239,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
 
               value={offerLater.preferences.offerLetterPrice}
               errors={errors.prefOfferLetter}
-            /> */}
+            />
 
             <SelectComponent
               name="preferences.intake"
@@ -263,7 +263,7 @@ const OfferLetterPreferences = ({ appId, updatedData, profileViewPath }) => {
                 className="bg-primary text-white px-6 py-2 rounded"
                 onClick={handleSubmit}
               >
-                Save
+                Submit
               </button>
             </div>
           </div>

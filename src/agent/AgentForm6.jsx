@@ -13,6 +13,9 @@ import { formSixSubmit } from "../features/agentApi";
 import { agentInformation } from "../features/agentSlice";
 import PopUp from "../components/reusable/PopUp";
 import { check } from "../assets";
+import socketServiceInstance from "../services/socket";
+import { editAgentAdmin } from "../features/adminApi";
+import { agentDataProfile } from "../features/adminSlice";
 
 const referenceTemplate = {
   referenceType: "",
@@ -24,16 +27,20 @@ const referenceTemplate = {
   country: "",
 };
 
-const AgentForm6 = ({hide, handleCancel, updateData}) => {
+const AgentForm6 = ({hide, handleCancel, updateData, adminId, agentId}) => {
   const { countryOption } = useSelector((state) => state.general);
   const { agentData } = useSelector((state) => state.agent);
-  const getData = agentData?.references || [];
+  const role = localStorage.getItem('role')
+  const { agentProfile } = useSelector((state) => state.admin);
+
+  const getData = role === "0" ?agentProfile?.references :  agentData?.references || [];
   const [isPopUp, setIsPopUp] = useState(false);
   const [referenceData, setReferenceData] = useState(
     getData.length > 0
       ? getData
       : [{ ...referenceTemplate }, { ...referenceTemplate }]
   );
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,6 +50,7 @@ const AgentForm6 = ({hide, handleCancel, updateData}) => {
   const editForm = hide === true ? "edit":null;
 
   useEffect(() => {
+  
     dispatch(agentInformation());
   }, [dispatch]);
 
@@ -126,10 +134,47 @@ const AgentForm6 = ({hide, handleCancel, updateData}) => {
     setLoading(true);
     if (validateForm()) {
       try {
-        const res = await formSixSubmit(referenceData, editForm);
+        const payload = {
+          references: referenceData, // Ensures it's an array
+          ...(role === "0" && { companyId: adminId }),
+  
+        };
+        
+        let res;
+
+        if (role === "0") {
+          await editAgentAdmin("/company/register-references-admin", payload, editForm);
+        } else {
+          res = await formSixSubmit(payload, editForm);
+        }
+      
+        if(role === "0"){
+          dispatch(agentDataProfile(agentId));
+        }
   
         toast.success(res?.message || "Data added successfully");
        {hide === true ?       updateData():  PopUpOpen()}
+       if (role === "2") {
+        if (socketServiceInstance.isConnected()) {
+          //from agent to admin
+          const notificationData = {
+            title: " AGENT_REGISTERED_FOR_APPROVAL",
+            message: `${agentData?.companyDetails?.businessName} ${agentData?.agId} Agent registered for approval.
+`,
+            path:"/admin/approvals",
+            recieverId: "",
+          };
+  
+          socketServiceInstance.socket.emit(
+            "NOTIFICATION_AGENT_TO_ADMIN",
+            notificationData
+          );
+        } else {
+          console.error("Socket connection failed, cannot emit notification.");
+        }
+      }
+   
+
       } catch (error) {
         console.error(error);
         toast.error(error.message || "Something went wrong");
@@ -142,7 +187,7 @@ const AgentForm6 = ({hide, handleCancel, updateData}) => {
   };
 
   return (
-    <div className="min-h-screen font-poppins">
+    <div className=" font-poppins">
        <div className={`${hide === true? "" : "md:mx-48 sm:mx-10"}`}>
 
         {referenceData.map((reference, index) => (

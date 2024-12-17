@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "../reusable/DragAndDrop";
 import { SelectComponent } from "../reusable/Input";
+import { useDispatch, useSelector } from "react-redux";
+import { getDocumentAll } from "../../features/generalSlice";
 
 const OfferLetterPop = ({
   isPopUp,
-  docLabel = "Upload Document", // Generic label for file upload
+  docLabel,
   resetDoc, // State to reset file upload
   setResetDoc, // Function to set reset state
   handleFileUpload, // Function to handle file upload
@@ -14,14 +16,19 @@ const OfferLetterPop = ({
   errors = {}, // Validation errors
   customClass = "", // Custom class for styling
   onSubmit,
-  PopUpClose, // Function afor submit action
+  PopUpClose,
+  studentId,
 }) => {
-  const navigate = useNavigate();
-
-  // Effect to reset the FileUpload component after submission or popup close
+  const dispatch = useDispatch();
+  const { getAllDocuments } = useSelector((state) => state.general);
+  const path = `/document/all-doc/${studentId}`
+  useEffect(() => {
+    dispatch(getDocumentAll({path}));
+  }, [dispatch, isPopUp]);
+  
   useEffect(() => {
     if (!isPopUp) {
-      setResetDoc(true); // Trigger reset when the popup closes
+      setResetDoc(true); 
     }
   }, [isPopUp, setResetDoc]);
 
@@ -35,7 +42,12 @@ const OfferLetterPop = ({
       PopUpClose(); // Close the popup after reset
     }, 300); // Adjust the timeout if needed
   };
-
+  const handleSelectChange = (e) => {
+    const selectedUrl = e.target.value;
+    if (selectedUrl) {
+      handleFileUpload([ selectedUrl]);
+    }
+  };
   return (
     <>
       {isPopUp && (
@@ -45,7 +57,6 @@ const OfferLetterPop = ({
           }`}
         >
           <div className="bg-white pb-9 rounded-lg md:w-[68%] w-full relative p-9 flex flex-col items-center justify-center">
-            <p className="text-sidebar text-[23px]">{docLabel}</p>
             <FileUpload
               label={docLabel}
               acceptedFormats={{
@@ -62,52 +73,27 @@ const OfferLetterPop = ({
             {errors.url && (
               <p className="text-red-500 mt-1 text-sm">{errors.url}</p>
             )}
-            {/* {Array.isArray(uploadedFiles) && uploadedFiles.length > 0 && (
-              <div className="mt-4">
-                <p className="text-secondary font-semibold">
-                  Uploaded Documents:
-                </p>
-                <ul>
-                  {uploadedFiles
-                    .filter(
-                      (url) => typeof url === "string" && url.startsWith("http")
-                    )
-                    .map((url, index) => (
-                      <li key={index} className="flex items-center mt-2">
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary underline"
-                        >
-                          Uploaded Document
-                        </a>
-                        <button
-                          onClick={() => handleDeleteFile(url)}
-                          className="ml-4 text-red-500"
-                        >
-                          Delete
-                        </button>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )} */}
+
             <hr className=" w-full" />
 
             <div className="w-full flex flex-col">
               <p className="text-[12px] text-body mt-1">
-                Formats accepted are pdf 
+                Formats accepted are pdf
               </p>
               <hr className="border border-body w-full mt-8" />
               <span className="mt-3"> Select from the list*</span>
-
               <select
-                name=""
-                id=""
+                name="documentSelect"
+                id="documentSelect"
                 className="w-full bg-input  h-10 rounded-md mt-1"
+                onChange={handleSelectChange}
               >
-                <option value=""></option>
+                <option value="">Select Document</option>
+                {getAllDocuments?.documents?.map((data, index) => (
+                  <option key={index} value={data?.viewUrl}>
+                    {data?.documentName}
+                  </option>
+                ))}
               </select>
             </div>
 

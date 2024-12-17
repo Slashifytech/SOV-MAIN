@@ -99,7 +99,7 @@ const pteScore = () => {
               Personal Information
             </span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath
             ? ""
             : !isOne && (
                 <span

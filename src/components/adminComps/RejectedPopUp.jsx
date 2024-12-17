@@ -7,6 +7,7 @@ const RejectedPopUp = ({
   id,
   applicationType,
   sectionData,
+  instituteData
 }) => {
   const [reviewText, setReviewText] = useState();
 
@@ -22,16 +23,16 @@ const RejectedPopUp = ({
             isOpen ? "block" : "hidden"
           }`}
         >
-          <div className="bg-white pb-9  rounded-lg md:w-[58%] w-full  relative p-9  ">
+          <div className="bg-white pb-9  rounded-lg md:w-[50%] w-full  relative p-9  ">
             <span className="flex flex-col items-center justify-center">
               <p className="text-center font-DMsans text-black font-semibold text-[16px] ">
-                Do you want to reject this user ?
+                Do you want to reject ?
               </p>
 
               <textarea
                 name=""
                 placeholder="Enter the reason for rejection..."
-                className="shadow mt-5 w-96 px-2  py-2 bg-input"
+                className="shadow mt-5 md:w-72 sm:w-72 lg:w-96 px-2  py-2 bg-input"
                 value={reviewText}
                 onChange={handleTextareaChange}
               ></textarea>
@@ -45,7 +46,7 @@ const RejectedPopUp = ({
               </span>
               <span
                 onClick={() => {
-                  handleFunc(id, "rejected", sectionData, reviewText);
+                  handleFunc(id, "rejected", sectionData, reviewText, instituteData);
                   closePopUp();
                 }}
                 className="px-8 py-2 cursor-pointer rounded-lg text-white bg-primary"

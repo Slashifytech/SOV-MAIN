@@ -42,15 +42,15 @@ const OffLetterPersonalInfo = ({appId, updatedData, profileViewPath}) => {
     if (applicationDataById) {
       setOfferLater({
         personalInformation: {
-          fullName: applicationDataById?.personalInformation?.fullName || "",
-          email: applicationDataById?.personalInformation?.email || "",
-          phoneNumber: applicationDataById?.personalInformation?.phoneNumber || "",
+          fullName: applicationDataById?.offerLetter?.personalInformation?.fullName || "",
+          email: applicationDataById?.offerLetter?.personalInformation?.email || "",
+          phoneNumber: applicationDataById?.offerLetter?.personalInformation?.phoneNumber || "",
           address: {
-            street: applicationDataById?.personalInformation?.address?.street || "",
-            city: applicationDataById?.personalInformation?.address?.city || "",
-            state: applicationDataById?.personalInformation?.address?.state || "",
-            postalCode: applicationDataById?.personalInformation?.address?.postalCode || "",
-            country: applicationDataById?.personalInformation?.address?.country || "",
+            street: applicationDataById?.offerLetter?.personalInformation?.address?.street || "",
+            city: applicationDataById?.offerLetter?.personalInformation?.address?.city || "",
+            state: applicationDataById?.offerLetter?.personalInformation?.address?.state || "",
+            postalCode: applicationDataById?.offerLetter?.personalInformation?.address?.postalCode || "",
+            country: applicationDataById?.offerLetter?.personalInformation?.address?.country || "",
           },
         },
       });
@@ -173,7 +173,7 @@ const OffLetterPersonalInfo = ({appId, updatedData, profileViewPath}) => {
             </span>
           </span>
           {/* Pencil icon visible only when the form is hidden */}
-             {profileViewPath === "/admin/applications-review" ? "" :
+             {profileViewPath ? "" :
             !isOne && (
             <span
               className="text-[24px] cursor-pointer transition-opacity duration-300 ease-in-out"
@@ -190,37 +190,37 @@ const OffLetterPersonalInfo = ({appId, updatedData, profileViewPath}) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">Full Name </span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.fullName || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.fullName || "NA"}
             </span>
             <span className="font-light mt-4">Phone Number</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.phoneNumber || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.phoneNumber || "NA"}
             </span>
             <span className="font-light mt-4">Province/State</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.address?.state || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.address?.state || "NA"}
             </span>
             <span className="font-light mt-4">Postal/Zip Code</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.address?.postalCode || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.address?.postalCode || "NA"}
             </span>
           </span>
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Email ID</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.email || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.email || "NA"}
             </span>
             <span className="font-light mt-4">Country</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.address?.country || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.address?.country || "NA"}
             </span>
             <span className="font-light mt-4">Address</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.address?.street || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.address?.street || "NA"}
             </span>
             <span className="font-light mt-4">City/Town</span>
             <span className="font-medium">
-              {applicationDataById?.personalInformation?.address?.city || "NA"}
+              {applicationDataById?.offerLetter?.personalInformation?.address?.city || "NA"}
             </span>
           </span>
         </div>
@@ -333,7 +333,7 @@ const OffLetterPersonalInfo = ({appId, updatedData, profileViewPath}) => {
               className="bg-primary text-white px-6 py-2 rounded"
               onClick={handleSubmit}
             >
-              Save
+              Submit
             </button>
           </div>
         )}

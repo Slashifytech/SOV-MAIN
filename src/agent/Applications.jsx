@@ -13,6 +13,7 @@ import { Typography } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import Dnf from "../components/Dnf";
 import { dnf } from "../assets";
+import ApplicationChoosePop from "../components/dashboardComp/ApplicationChoosePop";
 
 const Applications = () => {
   const { applicationOverviewData } = useSelector((state) => state.agent);
@@ -22,7 +23,6 @@ const Applications = () => {
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1); // Track the current page
   const [isLoading, setIsLoading] = useState(true);
-
   const totalUsersCount = applicationOverviewData?.pagination?.totalResults || 0;
   const currentPage = applicationOverviewData?.pagination?.currentPage;
   const totalPagesCount = applicationOverviewData?.pagination?.totalPages;
@@ -36,6 +36,7 @@ const Applications = () => {
       underReview: data?.underReviewCount || 0,
       approved: data?.approvedCount || 0,
       customLinkState: data?.studentInformationId,
+  
     })
   );
 
@@ -51,7 +52,7 @@ const Applications = () => {
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(1); // Reset to the first page on new search
+    setPage(1); 
   };
 
   const perPageOptions = [];
@@ -90,7 +91,7 @@ const Applications = () => {
         </span>
       </div>
       <div className="bg-white">
-        <span className="flex items-center pt-20 md:ml-[16.5%] sm:ml-[23%] ">
+        <span className="flex items-center pt-16 md:ml-[16.5%] sm:ml-[23%] sm:pb-6">
           <span>
             <p className="md:text-[28px] text-[22px] font-bold text-sidebar mt-6 ml-9">
               Application Overview ({totalUsersCount})
@@ -103,7 +104,7 @@ const Applications = () => {
         </span>
       </div>
       <span className="flex flex-row items-center justify-start md:ml-[19.5%] sm:ml-[28%] mt-6">
-        <span className="text-body">Show</span>
+        {/* <span className="text-body">Show</span>
         <select
           className="ml-3 border px-2 py-1 w-10 rounded outline-none"
           value={perPage}
@@ -115,8 +116,8 @@ const Applications = () => {
             </option>
           ))}
         </select>
-        <span className="px-3 text-body">entries</span>
-        <span className="flex flex-row items-center  ml-9">
+        <span className="px-3 text-body">entries</span> */}
+        <span className="flex flex-row items-center  ">
           <CustomInput
             className="h-11 w-80 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
             type="text"
@@ -131,7 +132,7 @@ const Applications = () => {
         </span>
       </span>
       {isLoading ? (
-        <div className="w-1 ml-[53%] mt-12">
+        <div className="w-full ml-[53%] mt-12">
           <Loader />
         </div>
       ) : applicationOverviewData?.studentOverview &&
@@ -140,10 +141,10 @@ const Applications = () => {
           <div className="md:ml-[19.5%] sm:ml-[28%] mt-6 z-0 ">
             <CustomTable
               tableHead={TABLE_HEAD}
-              tableRows={TABLE_ROWS}
+              tableRows={TABLE_ROWS} 
               SecondAction="Apply Application"
               customClass="border border-primary  px-2 rounded-xl text-primary font-normal text-[12px] py-1"
-              SecondLink="/offerLetter-apply"
+              // SecondLink="/offerLetter-apply"
               action={"View List"}
               link={"/agent/application/lists"}
               icon={<FaRegEye />}
@@ -168,6 +169,7 @@ const Applications = () => {
           />
         </div>
       )}
+  
     </>
   );
 };

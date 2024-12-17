@@ -33,9 +33,33 @@ import AdminLogin from "../admin/AdminLogin";
 import ProtectedAdmin from "./ProtectedAdmin";
 import HelpSupport from "../components/HelpSupport";
 import AllApplication from "../student/AllApplication";
-import StudentAgentInternal from './StudentAgentInternal';
+import StudentAgentInternal from "./StudentAgentInternal";
 import CommonRoleProtected from "./CommonRoleProtected";
 import AgentRoleProtected from "./AgentRoleProtected";
+import HelpNSupport from "../pages/HelpNSupport";
+import CourseFeeApplication from "../pages/CourseFeeApplication";
+// import ChangedashboardEmail from '../pages/ChangedashboardEmail';
+import ChangeDashboardPassword from "../pages/ChangeDashboardPassword";
+import ChangeDashboardEmail from "../components/dashboardComp/ChangedashboardEmail";
+import DashboardEmailOtp from "../components/dashboardComp/DashboardEmailOtp";
+import VisaApply from "../pages/VisaApply";
+import TicketSuppport from "./../admin/TicketSuppport";
+import ChangeEmail from "../admin/ChangeEmail";
+import ChangeAdminPassword from "../admin/ChangePassword";
+import StudentDirectory from "../admin/StudentDirectory";
+import AgentDirectory from "../admin/AgentDirectory";
+import VisaEdit from "../agent/VisaEdit";
+import CourseFeeEdit from "../agent/CourseFeeEdit";
+import AdminDashboard from "../admin/AdminDashboard";
+import VisaStatusComponent from "../components/dashboardComp/VisaStatusComponent";
+import Documents from "./../student/Documents";
+import AdminProfileEdit from "../admin/AdminProfileEdit";
+import ReApproval_Request from "../pages/ReApproval_Request";
+import NotificatonPage from "../pages/NotificatonPage";
+import ApplicationList from "../admin/ApplicationList";
+import StudentApplicationView from "../admin/StudentApplicationView";
+import NoAccess from "./../components/NoAccess";
+import DeleteAccount from "../pages/DeleteAccount";
 
 export const router = createBrowserRouter([
   {
@@ -76,20 +100,37 @@ export const router = createBrowserRouter([
     element: <AgentSignUp></AgentSignUp>,
   },
   {
+    path: "/agent/account-deleted",
+    element: <ReApproval_Request></ReApproval_Request>,
+  },
+  {
+    path: "/student/account-deleted",
+    element: <ReApproval_Request></ReApproval_Request>,
+  },
+  {
+    path: "/notifications",
+    element:
+    <CommonRoleProtected>
+    <NotificatonPage></NotificatonPage></CommonRoleProtected>
+  },
+  {
+    path: "/removed-user",
+    element: <NoAccess></NoAccess>,
+  },
+  {
     path: "/student-form/:page",
     element: (
       <StudentAgentProtected>
         <StudentReg></StudentReg>
-       </StudentAgentProtected>
+      </StudentAgentProtected>
     ),
   },
   {
     path: "/agent-form/:page",
     element: (
-      <AgentRoleProtected>     
-      <AgentReg></AgentReg>
+      <AgentRoleProtected>
+        <AgentReg></AgentReg>
       </AgentRoleProtected>
-      
     ),
   },
   {
@@ -100,53 +141,111 @@ export const router = createBrowserRouter([
       // </ProtectedStudent>
     ),
   },
+
+  {
+    path: "/course-fee",
+    element: (
+      <CommonRoleProtected>
+      <CourseFeeApplication></CourseFeeApplication>
+       </CommonRoleProtected>
+    ),
+  },
+  {
+    path: "/settings/change-password",
+    element: (
+      <StudentAgentProtected>
+      <ChangeDashboardPassword></ChangeDashboardPassword>
+      </StudentAgentProtected>
+    ),
+  },
+  {
+    path: "/settings/change-email",
+    element: (
+      <StudentAgentProtected>
+      <ChangeDashboardEmail></ChangeDashboardEmail>
+       </StudentAgentProtected>
+    ),
+  },
+  {
+    path: "/settings/otp-confirm",
+    element: (
+      <CommonRoleProtected>
+        <DashboardEmailOtp></DashboardEmailOtp>
+      </CommonRoleProtected>
+    ),
+  },
+
+  {
+    path: "/visa-apply",
+    element: (
+      <StudentAgentProtected>
+        <VisaApply></VisaApply>
+      </StudentAgentProtected>
+    ),
+  },
   //student routes
   {
     path: "/student/dashboard",
     element: (
       <ProtectedStudent>
-      <Dashboard></Dashboard>
-       </ProtectedStudent>
+        <Dashboard></Dashboard>
+      </ProtectedStudent>
     ),
   },
   {
     path: "/student/application",
     element: (
       <ProtectedStudent>
-      <AllApplication></AllApplication>
-       </ProtectedStudent>
+        <AllApplication></AllApplication>
+      </ProtectedStudent>
+    ),
+  },
+  {
+    path: "/student/visa-update",
+    element: (
+      <ProtectedStudent>
+        <VisaStatusComponent></VisaStatusComponent>
+      </ProtectedStudent>
+    ),
+  },
+  {
+    path: "/student/document",
+    element: (
+      <ProtectedStudent>
+        <Documents></Documents>
+      </ProtectedStudent>
     ),
   },
   {
     path: "/account/profile-edit",
     element: (
       <CommonRoleProtected>
-      <StudentProfile></StudentProfile>
+        <StudentProfile></StudentProfile>
       </CommonRoleProtected>
     ),
   },
   {
     path: "/student/shortlist",
     element: (
-       <StudentAgentInternal>
-      <AgentShortlist></AgentShortlist>
-    </StudentAgentInternal>
+      <StudentAgentProtected>
+        <AgentShortlist></AgentShortlist>
+      </StudentAgentProtected>
     ),
   },
   {
     path: "/help-support",
     element: (
-       <StudentAgentInternal>
-      <HelpSupport></HelpSupport>
-     </StudentAgentInternal>
+      <StudentAgentProtected>
+        <HelpNSupport></HelpNSupport>
+      </StudentAgentProtected>
     ),
   },
   {
     path: "/offerLetter-apply",
     element: (
-      <StudentAgentInternal>
-      <ApplyOfferLater></ApplyOfferLater>
-      </StudentAgentInternal>
+      <StudentAgentProtected>
+        <ApplyOfferLater></ApplyOfferLater>
+      </StudentAgentProtected>
     ),
   },
 
@@ -155,7 +254,7 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedAgent>
         <AgentDashboard></AgentDashboard>
-       </ProtectedAgent>
+      </ProtectedAgent>
     ),
   },
   {
@@ -163,37 +262,49 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedAgent>
         <StudentsList></StudentsList>
-       </ProtectedAgent>
+      </ProtectedAgent>
     ),
-    
   },
 
   {
     path: "/student-profile",
     element: (
-       <CommonRoleProtected>
+      <CommonRoleProtected>
         <StudentProfile></StudentProfile>
-       </CommonRoleProtected>
+      </CommonRoleProtected>
     ),
-    
   },
   {
     path: "/agent-profile",
     element: (
-       <CommonRoleProtected>
+      <CommonRoleProtected>
         <ProfileEdit></ProfileEdit>
-     </CommonRoleProtected>
+      </CommonRoleProtected>
     ),
-    
   },
   {
     path: "/application-view",
     element: (
       <CommonRoleProtected>
         <OfferLetterEdit></OfferLetterEdit>
-     </CommonRoleProtected>
+      </CommonRoleProtected>
     ),
-    
+  },
+  {
+    path: "/coursefee-view",
+    element: (
+      <CommonRoleProtected>
+        <CourseFeeEdit></CourseFeeEdit>
+      </CommonRoleProtected>
+    ),
+  },
+  {
+    path: "/visa-view",
+    element: (
+      <CommonRoleProtected>
+        <VisaEdit></VisaEdit>
+      </CommonRoleProtected>
+    ),
   },
   {
     path: "/agent/applications",
@@ -202,16 +313,19 @@ export const router = createBrowserRouter([
         <Applications></Applications>
       </ProtectedAgent>
     ),
-    
   },
+
   {
     path: "/agent/application/lists",
+    element: <ApplicationView></ApplicationView>,
+  },
+  {
+    path: "/settings/delete-account",
     element: (
-      <ProtectedAgent>
-        <ApplicationView></ApplicationView>
-       </ProtectedAgent>
+      <StudentAgentProtected>
+        <DeleteAccount></DeleteAccount>
+      </StudentAgentProtected>
     ),
-    
   },
   {
     path: "/offerLetter/edit",
@@ -220,7 +334,22 @@ export const router = createBrowserRouter([
         <OfferLetterEdit></OfferLetterEdit>
       </CommonRoleProtected>
     ),
-    
+  },
+  {
+    path: "/visa/edit",
+    element: (
+      <CommonRoleProtected>
+        <VisaEdit></VisaEdit>
+      </CommonRoleProtected>
+    ),
+  },
+  {
+    path: "/course-fee/edit",
+    element: (
+      <CommonRoleProtected>
+        <CourseFeeEdit></CourseFeeEdit>
+      </CommonRoleProtected>
+    ),
   },
   {
     path: "/account-settings/profile-edit",
@@ -229,16 +358,22 @@ export const router = createBrowserRouter([
         <ProfileEdit></ProfileEdit>
       </CommonRoleProtected>
     ),
-    
+  },
+  {
+    path: "/agent-profile",
+    element: (
+      <ProtectedAdmin>
+        <ProfileEdit></ProfileEdit>
+      </ProtectedAdmin>
+    ),
   },
   {
     path: "/agent/shortlist",
     element: (
-      <StudentAgentInternal>
+      <StudentAgentProtected>
         <AgentShortlist></AgentShortlist>
-      </StudentAgentInternal>
+      </StudentAgentProtected>
     ),
-    
   },
   {
     path: "/agent/institution",
@@ -247,34 +382,117 @@ export const router = createBrowserRouter([
         <Institution></Institution>
       </ProtectedAgent>
     ),
-    
   },
   {
     path: "/admin/approvals",
     element: (
-       <ProtectedAdmin>
+      <ProtectedAdmin>
         <Approval></Approval>
       </ProtectedAdmin>
     ),
-    
   },
   {
     path: "/admin/applications-review",
     element: (
-       <ProtectedAdmin>
+      <ProtectedAdmin>
         <ApplicationReview></ApplicationReview>
-       </ProtectedAdmin>
+      </ProtectedAdmin>
     ),
-    
   },
-
+  {
+    path: "/admin/applications-review",
+    element: (
+      <ProtectedAdmin>
+        <ApplicationReview></ApplicationReview>
+      </ProtectedAdmin>
+    ),
+  },
   //admin routes
   {
     path: "/admin/role/auth/login",
+    element: <AdminLogin></AdminLogin>,
+  },
+  {
+    path: "/admin/dashboard",
     element: (
-        <AdminLogin></AdminLogin>
+      <ProtectedAdmin>
+        <AdminDashboard></AdminDashboard>
+      </ProtectedAdmin>
     ),
-    
+  },
+  {
+    path: "/admin/ticket",
+    element: (
+      <ProtectedAdmin>
+        <TicketSuppport></TicketSuppport>
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/application-list",
+
+    element: (
+      <ProtectedAdmin>
+        <ApplicationList></ApplicationList>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/student-applications",
+    element: (
+      <ProtectedAdmin>
+        <StudentApplicationView></StudentApplicationView>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/change-email",
+    element: (
+      <ProtectedAdmin>
+        <ChangeEmail></ChangeEmail>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/profile",
+    element: (
+      <ProtectedAdmin>
+        <AdminProfileEdit></AdminProfileEdit>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/change-password",
+    element: (
+      <ProtectedAdmin>
+        <ChangeAdminPassword></ChangeAdminPassword>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/agent-directory",
+    element: (
+      <ProtectedAdmin>
+        {" "}
+        <AgentDirectory></AgentDirectory>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/agent-student",
+    element: (
+      <ProtectedAdmin>
+        <StudentDirectory></StudentDirectory>{" "}
+      </ProtectedAdmin>
+    ),
+  },
+  {
+    path: "/admin/student-directory",
+    element: (
+      <ProtectedAdmin>
+        <StudentDirectory></StudentDirectory>{" "}
+      </ProtectedAdmin>
+    ),
   },
   {
     path: "/*",

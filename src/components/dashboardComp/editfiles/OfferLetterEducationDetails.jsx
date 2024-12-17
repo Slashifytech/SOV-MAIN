@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { GiGraduateCap } from "react-icons/gi";
 import { CustomInput } from "../../reusable/Input";
 import OfferLetterPop from "../OfferLetterPop";
-import { OfferLetterEduInfoEdit } from "../../../features/generalApi";
+import { deleteDocument, OfferLetterEduInfoEdit, uploadDocument } from "../../../features/generalApi";
 import { useSelector } from "react-redux";
 import { FiUpload } from "react-icons/fi";
 import {
@@ -16,7 +17,7 @@ import { toast } from "react-toastify";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbPencilMinus } from "react-icons/tb";
 import { FaRegEye } from "react-icons/fa";
-import { v4 as uuidv4 } from 'uuid';
+
 // Define required marksheets for each education level
 const educationLevels = {
   diploma: ["markSheet10"],
@@ -44,7 +45,7 @@ const initialEducationDetails = {
   markSheetPostGraduate: "",
 };
 
-const OfferLetterEducationDetails = ({ appId, updatedData, profileViewPath }) => {
+const OfferLetterEducationDetails = ({ appId, updatedData, profileViewPath, userId }) => {
   const [offerLater, setOfferLater] = useState({
     educationDetails: { ...initialEducationDetails },
   });
@@ -86,30 +87,47 @@ const [newFiles, setNewFiles] = useState([]);
     PopUpOpen();
   };
   const handleFileUpload = (files, uploadType) => {
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0 || !uploadType) return;
   
-    // Save file locally to be uploaded later
-    setNewFiles((prevState) => [
-      ...prevState,
-      { file: files[0], uploadType },
-    ]);
+    const fileOrUrl = files[0];
   
-    // Show a temporary file URL for preview
-    setOfferLater((prevState) => ({
-      ...prevState,
-      educationDetails: {
-        ...prevState.educationDetails,
-        [uploadType]: URL.createObjectURL(files[0]),
-      },
-    }));
+    if (fileOrUrl instanceof File) {
+      // Handle File objects
+      const blobUrl = URL.createObjectURL(fileOrUrl);
   
-    // toast.info(`${files[0].name} will be uploaded upon saving.`);
+      // Save file locally to be uploaded later
+      setNewFiles((prevState) => [
+        ...prevState,
+        { file: fileOrUrl, uploadType },
+      ]);
+  
+      // Show a temporary file URL for preview
+      setOfferLater((prevState) => ({
+        ...prevState,
+        educationDetails: {
+          ...prevState.educationDetails,
+          [uploadType]: blobUrl, // Set blob URL temporarily
+        },
+      }));
+  
+      // toast.info(`${fileOrUrl.name} will be uploaded upon saving.`);
+    } else if (typeof fileOrUrl === "string") {
+      // Handle URL strings: directly set in the educationDetails state
+      setOfferLater((prevState) => ({
+        ...prevState,
+        educationDetails: {
+          ...prevState.educationDetails,
+          [uploadType]: fileOrUrl, // Set the URL directly
+        },
+      }));
+  
+      // toast.info("Document URL has been set.");
+    }
   };
   
-
-  const deleteFile = (fileUrl, uploadType) => {
+  const deleteFile = async(fileUrl, uploadType) => {
     if (!fileUrl) return;
-  
+
     // Add file to deletedFiles array for deferred deletion
     setDeletedFiles((prevState) => [
       ...prevState,
@@ -158,31 +176,34 @@ const handleSubmit = async () => {
   try {
     setIsSubmitting(true);
     // Delete files marked for deletion
-    for (const { fileUrl } of deletedFiles) {
-      const storageRef = ref(storage, fileUrl);
-      try {
-        await deleteObject(storageRef);
-        // toast.success(`File ${fileUrl} deleted successfully.`);
-      } catch (error) {
-        // toast.error(`Error deleting file: ${fileUrl}`);
-      }
-    }
+    // for (const { fileUrl } of deletedFiles) {
+    //   const storageRef = ref(storage, fileUrl);
+    //   try {
+    //     await deleteObject(storageRef);
+    // await deleteDocument(fileUrl)
+
+    //     // toast.success(`File ${fileUrl} deleted successfully.`);
+    //   } catch (error) {
+    //     // toast.error(`Error deleting file: ${fileUrl}`);
+    //   }
+    // }
 
     // Prepare to upload files and collect Firebase URLs
     const updatedEducationDetails = { ...offerLater.educationDetails };
 
     await Promise.all(
       newFiles.map(async ({ file, uploadType }) => {
-        const uniqueFileName = `${uuidv4()}-${file.name}`;
-        const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
+       const uniqueFileName = `${uuidv4()}-${file.name}`;
+    const storageRef = ref(storage, `uploads/offerLetter/${uniqueFileName}`);
         try {
           const snapshot = await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(snapshot.ref);
 
           // Update temporary object with Firebase URL
           updatedEducationDetails[uploadType] = downloadURL;
-
-          // toast.success(`${file.name} uploaded successfully.`);
+          const uploadData = { viewUrl: downloadURL, documentName: file.name, userId: userId };
+          await uploadDocument(uploadData);
+          toast.success(`${file.name} uploaded successfully.`);
         } catch (error) {
           toast.error(`Error uploading ${file.name}. Please try again.`);
         }
@@ -219,23 +240,23 @@ const handleSubmit = async () => {
 };
 
   useEffect(() => {
-    if (applicationDataById?.educationDetails) {
+    if (applicationDataById?.offerLetter?.educationDetails) {
       setOfferLater((prevState) => ({
         ...prevState,
         educationDetails: {
           educationLevel:
-            applicationDataById?.educationDetails.educationLevel || "",
-          markSheet10: applicationDataById?.educationDetails.markSheet10 || "",
-          markSheet12: applicationDataById?.educationDetails.markSheet12 || "",
+            applicationDataById?.offerLetter.educationDetails.educationLevel || "",
+          markSheet10: applicationDataById?.offerLetter.educationDetails.markSheet10 || "",
+          markSheet12: applicationDataById?.offerLetter.educationDetails.markSheet12 || "",
           markSheetUnderGraduate:
-            applicationDataById?.educationDetails.markSheetUnderGraduate || "",
+            applicationDataById?.offerLetter.educationDetails.markSheetUnderGraduate || "",
           markSheetPostGraduate:
-            applicationDataById?.educationDetails.markSheetPostGraduate || "",
+            applicationDataById?.offerLetter.educationDetails.markSheetPostGraduate || "",
         },
       }));
 
       setSelectedEducation(
-        applicationDataById?.educationDetails.educationLevel || ""
+        applicationDataById?.offerLetter.educationDetails.educationLevel || ""
       );
     }
   }, [applicationDataById]);
@@ -257,7 +278,7 @@ console.log(applicationDataById)
             </span>
             <span className="font-semibold text-[22px]">Education Details</span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath 
             ? ""
             : !isOne && (
                 <span
@@ -278,7 +299,7 @@ console.log(applicationDataById)
                 <span className="font-light">Level of Education</span>
                 <span className="font-medium ">
                   {educationLevelLabels[
-                    applicationDataById?.educationDetails?.educationLevel
+                    applicationDataById?.offerLetter?.educationDetails?.educationLevel
                   ] || "NA"}
                 </span>
               </span>
@@ -289,12 +310,12 @@ console.log(applicationDataById)
                 <a
                   className="flex items-center gap-3 text-primary font-medium"
                   href={
-                    applicationDataById?.educationDetails?.markSheet10 || "#"
+                    applicationDataById?.offerLetter?.educationDetails?.markSheet10 || "#"
                   }
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {applicationDataById?.educationDetails?.markSheet10 &&
+                  {applicationDataById?.offerLetter?.educationDetails?.markSheet10 &&
                      "Uploaded"
                     }
                   <span>
@@ -303,16 +324,16 @@ console.log(applicationDataById)
                 </a>
               </span>
 
-              {applicationDataById?.educationDetails?.markSheet12 && (
+              {applicationDataById?.offerLetter?.educationDetails?.markSheet12 && (
                 <>
                   <span className="font-light mt-4">12th Marksheet</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
-                    href={applicationDataById?.educationDetails?.markSheet12}
+                    href={applicationDataById?.offerLetter?.educationDetails?.markSheet12}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.educationDetails?.markSheet12
+                    {applicationDataById?.offerLetter?.educationDetails?.markSheet12
                       ? "Uploaded"
                       : "NA"}
                     <span>
@@ -323,20 +344,20 @@ console.log(applicationDataById)
               )}
             </span>
             <span className="w-1/2">
-              {applicationDataById?.educationDetails
+              {applicationDataById?.offerLetter?.educationDetails
                 ?.markSheetUnderGraduate && (
                 <>
                   <span className="font-light mt-4">Under Graduate</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
                     href={
-                      applicationDataById?.educationDetails
+                      applicationDataById?.offerLetter?.educationDetails
                         ?.markSheetUnderGraduate
                     }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.educationDetails
+                    {applicationDataById?.offerLetter?.educationDetails
                       ?.markSheetUnderGraduate
                       ? "Uploaded"
                       : "NA"}
@@ -347,19 +368,19 @@ console.log(applicationDataById)
                 </>
               )}
 
-              {applicationDataById?.educationDetails?.markSheetPostGraduate && (
+              {applicationDataById?.offerLetter?.educationDetails?.markSheetPostGraduate && (
                 <>
                   <span className="font-light mt-4">Post Graduate</span>
                   <a
                     className="flex items-center gap-3 text-primary font-medium"
                     href={
-                      applicationDataById?.educationDetails
+                      applicationDataById?.offerLetter?.educationDetails
                         ?.markSheetPostGraduate
                     }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {applicationDataById?.educationDetails
+                    {applicationDataById?.offerLetter?.educationDetails
                       ?.markSheetPostGraduate
                       ? "Uploaded"
                       : "NA"}
@@ -475,7 +496,7 @@ console.log(applicationDataById)
                     className="bg-primary text-white px-6 py-2 rounded"
                     onClick={handleSubmit}
                   >
-                    {isSubmitting ? "Submitting..." : "Save"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               )}
@@ -489,6 +510,7 @@ console.log(applicationDataById)
         docLabel="Upload Marksheet"
         PopUpClose={PopUpClose}
         setResetDoc={setResetDoc}
+        studentId={userId}
         handleFileUpload={(files) => handleFileUpload(files, isFileType)}
         onSubmit={() => {
           console.log("Form Submitted");

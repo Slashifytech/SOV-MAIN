@@ -3,8 +3,13 @@ import {
   countryInstituteOptions,
   countryOptions,
   courseData,
+  getAllDocument,
+  getAllTicket,
   getStudentDataById,
+  getVisaStatus,
+  getWithdrawalData,
   prefferedCountry,
+  recieveDocument,
 } from "./generalApi";
 
 export const getCountryOption = createAsyncThunk(
@@ -78,8 +83,76 @@ export const studentById = createAsyncThunk(
     }
   }
 );
-
-
+export const allTicket = createAsyncThunk(
+  "general/allTicket",
+  async ({page, perPage, isPriorityType, isStatusType, search, isDate}, { rejectWithValue }) => {
+    try {
+      const res = await getAllTicket(page, perPage, isPriorityType, isStatusType, search, isDate);
+      // console.log(res);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Failed to fetch country options"
+      );
+    }
+  }
+);
+export const visaStatusData = createAsyncThunk(
+  "general/visaStatusData",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await getVisaStatus(id);
+      // console.log(res);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Failed to fetch country options"
+      );
+    }
+  }
+);
+export const getDocumentAll = createAsyncThunk(
+  "general/getDocumentAll",
+  async ({path, search, page, perPage}, { rejectWithValue }) => {
+    try {
+      const res = await getAllDocument(path,search, page, perPage);
+      // console.log(res);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Failed to fetch country options"
+      );
+    }
+  }
+);
+export const getRecievedDocument = createAsyncThunk(
+  "general/getRecievedDocument",
+  async ({studentId, page, perPage, search, isType }, { rejectWithValue }) => {
+    try {
+      const res = await recieveDocument(studentId, page, perPage, search, isType );
+      // console.log(res);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Failed to fetch country options"
+      );
+    }
+  }
+);
+export const withdrawalDataGet = createAsyncThunk(
+  "general/withdrawalDataGet",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await getWithdrawalData(userId);
+      // console.log(res);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Failed to fetch country options"
+      );
+    }
+  }
+);
 const generalSlice = createSlice({
   name: "general",
   initialState: {
@@ -88,6 +161,11 @@ const generalSlice = createSlice({
     instituteOption: [],
     courses:[],
     studentData:null,
+    getAllTicket: [],
+    visaStatus:[],
+    getAllDocuments: [],
+    recieveDocs:[],
+    withdrawalData: "",
     status: "idle",
     error: null,
   },
@@ -161,6 +239,70 @@ const generalSlice = createSlice({
       })
       .addCase(studentById.rejected, (state, action) => {
         state.status = "failed";
+        state.error = action.payload || action.error.message;
+      }).addCase(allTicket.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(allTicket.fulfilled, (state, action) => {
+        state.getAllTicket = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(allTicket.rejected, (state, action) => {
+        state.status = "failed";
+        state.getAllTicket = []
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(visaStatusData.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(visaStatusData.fulfilled, (state, action) => {
+        state.visaStatus = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(visaStatusData.rejected, (state, action) => {
+        state.status = "failed";
+     
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(getDocumentAll.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getDocumentAll.fulfilled, (state, action) => {
+        state.getAllDocuments = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(getDocumentAll.rejected, (state, action) => {
+        state.status = "failed";
+     
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(getRecievedDocument.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getRecievedDocument.fulfilled, (state, action) => {
+        state.recieveDocs = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(getRecievedDocument.rejected, (state, action) => {
+        state.status = "failed";
+     
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(withdrawalDataGet.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(withdrawalDataGet.fulfilled, (state, action) => {
+        state.withdrawalData = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(withdrawalDataGet.rejected, (state, action) => {
+        state.status = "failed";
+     
         state.error = action.payload || action.error.message;
       });
   },

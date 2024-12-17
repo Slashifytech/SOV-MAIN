@@ -22,7 +22,9 @@ import {
 import { storage } from "../utils/fireBase";
 import { agentInformation } from "../features/agentSlice";
 import { ImBin } from "react-icons/im";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import { editAgentAdmin } from "../features/adminApi";
+import { agentDataProfile } from "../features/adminSlice";
 const initialContactData = {
   title: "",
   firstName: "",
@@ -49,11 +51,13 @@ const initialAdmissionData = {
 
 const maxadmissionsContacts = 5; // Define the maximum number of admissions contacts
 
-const AgentForm2 = ({hide, handleCancel, updateData}) => {
+const AgentForm2 = ({ hide, handleCancel, updateData, adminId, agentId }) => {
+  const role = localStorage.getItem('role')
+  const { agentProfile } = useSelector((state) => state.admin);
   const { countryOption } = useSelector((state) => state.general);
   const { agentData } = useSelector((state) => state.agent);
   const [resetProfilePic, setResetProfilePic] = useState(false);
-  const contactDetails = agentData;
+  const contactDetails = role === "0" ? agentProfile : agentData;
   const [contactData, setContactData] = useState({
     primaryContact: { ...initialContactData },
     commissionContact: { ...initialcommissionContactData },
@@ -62,7 +66,7 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const editForm = hide === true ? "edit":null;
+  const editForm = hide === true ? "edit" : null;
 
   useEffect(() => {
     dispatch(agentInformation());
@@ -70,15 +74,18 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
   // Handle Input Changes
   const handleInput = (e, section, index) => {
     const { name, value } = e.target;
-    const nameRegex = /^[A-Za-z\s]*$/; 
-  console.log(name)
-  if ((name === "firstName" || name === "lastName" || name === "fullName") && !nameRegex.test(value)) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: "Only alphabets and spaces are allowed.",
-    }));
-    return;
-  }
+    const nameRegex = /^[A-Za-z\s]*$/;
+    console.log(name);
+    if (
+      (name === "firstName" || name === "lastName" || name === "fullName") &&
+      !nameRegex.test(value)
+    ) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "Only alphabets and spaces are allowed.",
+      }));
+      return;
+    }
     if (section === "admissionsContacts") {
       const updatedAdmissionsContacts = [...contactData.admissionsContacts];
       updatedAdmissionsContacts[index][name] = value;
@@ -97,14 +104,13 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
     }
   };
   const handleFileUpload = async (files) => {
-    if (!files || files.length === 0) return; 
+    if (!files || files.length === 0) return;
 
-    const uploadedUrls = []; 
+    const uploadedUrls = [];
 
     for (const file of files) {
       console.log(`Uploading file: ${file.name}`);
 
-      // const storageRef = ref(storage, `uploads/agentData${file.name}`); 
       const uniqueFileName = `${uuidv4()}-${file.name}`;
       const storageRef = ref(storage, `uploads/agentData/${uniqueFileName}`);
       try {
@@ -222,7 +228,6 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
     }));
   };
 
-
   //firebase check for file existing
   // const checkFileExists = async (fileUrl) => {
   //   const storageRef = ref(storage, fileUrl);
@@ -233,22 +238,21 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
   //     if (error.code === 'storage/object-not-found') {
   //       return false;
   //     }
-  //     throw error; 
+  //     throw error;
   //   }
   // };
-  
+
   const deleteFile = async (fileUrl) => {
     if (!fileUrl) return;
-  
+
     // Check if file exists
 
-  
     const storageRef = ref(storage, fileUrl);
-    
+
     try {
       await deleteObject(storageRef);
       toast.success("File deleted successfully!");
-  
+
       setContactData((prevData) => ({
         ...prevData,
         primaryContact: {
@@ -260,10 +264,10 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
       }));
       setResetProfilePic(true);
     } catch (error) {
-      console.error("Error deleting file:", error); 
-      if (error.code === 'storage/object-not-found') {
+      console.error("Error deleting file:", error);
+      if (error.code === "storage/object-not-found") {
         console.error("The file does not exist or has already been deleted.");
-      } else if (error.code === 'storage/unauthorized') {
+      } else if (error.code === "storage/unauthorized") {
         console.error("User does not have permission to access the object.");
       } else {
         console.error("Some other error occurred:", error);
@@ -275,6 +279,7 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
   useEffect(() => {
     if (contactDetails) {
       setContactData({
+        companyId:adminId,
         primaryContact: {
           title: contactDetails.primaryContact?.title || "",
           firstName: contactDetails.primaryContact?.firstName || "",
@@ -285,9 +290,8 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
           country: contactDetails.primaryContact?.country || "",
           phoneNumber: contactDetails.primaryContact?.phoneNumber || "",
           profilePicture: contactDetails.primaryContact?.profilePicture
-       
-          ? [contactDetails.primaryContact.profilePicture]  
-          : []
+            ? [contactDetails.primaryContact.profilePicture]
+            : [],
         },
         commissionContact: {
           fullName: contactDetails.commissionContact?.fullName || "",
@@ -308,7 +312,7 @@ const AgentForm2 = ({hide, handleCancel, updateData}) => {
       });
     }
   }, [contactDetails]);
-console.log(contactDetails.primaryContact?.profilePicture || [])
+  console.log(contactDetails.primaryContact?.profilePicture || []);
   // Handle Submit form
   const handleSubmit = async () => {
     if (validateFields()) {
@@ -321,7 +325,7 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               contactData.primaryContact.profilePicture
             )
               ? contactData.primaryContact.profilePicture.join(",")
-              : contactData.primaryContact.profilePicture, 
+              : contactData.primaryContact.profilePicture,
           },
           admissionsContacts: contactData.admissionsContacts.map(
             (admission) => ({
@@ -330,10 +334,25 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
             })
           ),
         };
-        const res = await formTwoSubmit(dataToSubmit, editForm);
-   
+
+
+        let res;
+
+        if (role === "0") {
+          await editAgentAdmin("/company/register-companyContact-admin", dataToSubmit, editForm);
+        } else {
+          res = await formTwoSubmit(dataToSubmit, editForm);
+        }
+      
+        if(role === "0"){
+          dispatch(agentDataProfile(agentId));
+        }
         toast.success(res?.message || "Data added successfully");
-      {hide === true ?      updateData() : navigate("/agent-form/3", { state: "passPage" })}
+        {
+          hide === true
+            ? updateData()
+            : navigate("/agent-form/3", { state: "passPage" });
+        }
       } catch (error) {
         console.log(error);
         toast.error(error.message || "Something went wrong");
@@ -342,11 +361,16 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
   };
   return (
     <div className="min-h-screen font-poppins">
-  <div className={`${hide === true? "" : "md:mx-48 sm:mx-10"}`}>
-      {hide === true ? "" : <>
-        <p className="text-heading font-semibold text-[25px] pt-7">
-          Primary Contact Information
-        </p></>}
+      <div className={`${hide === true ? "" : "md:mx-48 sm:mx-10"}`}>
+        {hide === true ? (
+          ""
+        ) : (
+          <>
+            <p className="text-heading font-semibold text-[25px] pt-7">
+              Primary Contact Information
+            </p>
+          </>
+        )}
         <div
           className={`bg-white rounded-xl ${
             hide === true ? "" : "px-8"
@@ -404,7 +428,6 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
                 name="country"
                 label="Country"
                 customClass="bg-input"
-
                 options={countryOption}
                 value={contactData.primaryContact.country}
                 handleChange={(e) => handleInput(e, "primaryContact")}
@@ -548,16 +571,17 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
         </p>
         {contactData.admissionsContacts.map((admission, index) => (
           <>
-          <div
-          key={index}
-          className={`bg-white rounded-xl ${
-            hide === true ? "" : "px-8"
-          } py-4 pb-12 mt-6`}
-        >
+            <div
+              key={index}
+              className={`bg-white rounded-xl ${
+                hide === true ? "" : "px-8"
+              } py-4 pb-12 mt-6`}
+            >
               {/* Inputs for admission contact */}
               <div className="flex items-baseline justify-between gap-6 w-full">
                 <span className="w-[50%]">
                   <Register
+                    // imp="*"
                     name="fullName"
                     type="text"
                     label="Full Name"
@@ -570,6 +594,7 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
                 </span>
                 <span className="w-[50%]">
                   <Register
+                    // imp="*"
                     name="positionJobTitle"
                     type="text"
                     label="Position/Job Title"
@@ -585,11 +610,9 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               <div className="flex items-baseline justify-between gap-6 w-full">
                 <span className="w-[50%]">
                   <CountrySelect
-                notImp={true}
-
                     name="destinationCountry"
                     customClass="bg-input"
-
+                    notImp={true}
                     label="Country"
                     options={countryOption}
                     value={admission.destinationCountry}
@@ -601,7 +624,6 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
                 </span>
                 <span className="w-[50%]">
                   <Register
-                    
                     name="email"
                     type="email"
                     label="Email"
@@ -615,8 +637,7 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               </div>
               <div className="mt-8">
                 <PhoneInputComponent
-                notImp={true}
-
+                  notImp={true}
                   label="Phone Number"
                   phoneData={admission.mobileNumber}
                   onPhoneChange={(phoneData) =>
@@ -654,8 +675,8 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
             </button>
           )}
         </div>
-        {hide === true ?
-        <div className="flex justify-end mt-9 gap-4 ">
+        {hide === true ? (
+          <div className="flex justify-end mt-9 gap-4 ">
             <button
               className="border border-greyish text-black px-4 py-2 rounded"
               onClick={() => handleCancel("isTwo")}
@@ -670,14 +691,16 @@ console.log(contactDetails.primaryContact?.profilePicture || [])
               }}
             >
               Save
-            </button> 
-            </div> :  
-        <FormNavigationButtons
-          backLink="/agent-form/1"
-          backText="Back"
-          buttonText="Submit and Continue"
-          handleButtonClick={handleSubmit}
-        />}
+            </button>
+          </div>
+        ) : (
+          <FormNavigationButtons
+            backLink="/agent-form/1"
+            backText="Back"
+            buttonText="Submit and Continue"
+            handleButtonClick={handleSubmit}
+          />
+        )}
       </div>
 
       {/* Submit Button */}

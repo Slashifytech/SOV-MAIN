@@ -30,11 +30,17 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { agentInformation } from "../features/agentSlice";
 import { v4 as uuidv4 } from 'uuid';
+import { editAgentAdmin } from "../features/adminApi";
+import { agentDataProfile } from "../features/adminSlice";
 
-const AgentForm4 = ({ hide, handleCancel, updateData }) => {
+const AgentForm4 = ({ hide, handleCancel, updateData, adminId, agentId }) => {
+  const role = localStorage.getItem('role')
+
   const { countryOption } = useSelector((state) => state.general);
   const { agentData } = useSelector((state) => state.agent);
-  const getData = agentData?.companyOverview;
+  const { agentProfile } = useSelector((state) => state.admin);
+  const getData = role === "0" ? agentProfile?.companyOverview :agentData?.companyOverview;
+
   const navigate = useNavigate();
 
   const [overviewData, setOverviewData] = useState({
@@ -188,7 +194,7 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
 
     try {
       await deleteObject(storageRef);
-      toast.success("File deleted successfully!");
+      // toast.success("File deleted successfully!");
 
       if (uploadType === "businessRegistrationDocument") {
         setOverviewData((prevData) => ({
@@ -213,7 +219,7 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
       }
     } catch (error) {
       console.error("Error deleting file:", error);
-      toast.error("Error deleting file. Please try again.");
+      // toast.error("Error deleting file. Please try again.");
     }
   };
 
@@ -258,7 +264,24 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
     if (validateFields()) {
       try {
         console.log("Submitting data:", overviewData);
-        const res = await formFourSubmit(overviewData, editForm);
+        const payload = {
+          ...overviewData,
+          ...(role === "0" && { companyId: adminId }),
+        };
+        
+        let res;
+
+        if (role === "0") {
+          await editAgentAdmin("/company/register-companyOverview-admin", payload, editForm);
+        } else {
+          res = await formFourSubmit(payload, editForm);
+        }
+        if(role === "0"){
+          dispatch(agentDataProfile(agentId));
+        }
+      
+
+     
 
         toast.success(res?.message || "Data added successfully");
         {
@@ -270,6 +293,8 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
         console.error(error);
         toast.error(error?.message || "Something went wrong");
       }
+    } else {
+      toast.error("Please fill in all required fields correctly.");
     }
   };
   return (
@@ -388,7 +413,7 @@ const AgentForm4 = ({ hide, handleCancel, updateData }) => {
               errors={errors.businessRegistrationType}
             />
           </span>
-          <div className="flex  items-baseline justify-between gap-6 w-full">
+          <div className="flex   items-baseline justify-between gap-6 w-full">
             <span className="w-[50%] ">
               <FileUpload
                 label="Company GST"

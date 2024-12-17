@@ -37,10 +37,10 @@ console.log(location)
   const closeLogout = () => {
     setisLogoutOpen(false);
   };
-  console.log(location);
+  console.log(page);
   useEffect(() => {
     if (!page || isNaN(page) || page < 1 || page > formArray.length) {
-      navigate(`/student-form/1`,{ state: "passPage" });
+      navigate(`/student-form/1`);
     }
     dispatch(getStudentData(studentId));
   }, [page, navigate, formArray.length, dispatch]);

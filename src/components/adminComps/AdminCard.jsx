@@ -21,10 +21,14 @@ const AdminCard = ({
   currentStatus,
   rejectionMessage,
   sectionData,
-  pageType
+  pageType,
+  instituteData,
+  mgdbId,
+  agentId
 
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen]
+   = useState(false);
   const closePopUp = () => setIsOpen(false);
   const openPopUp = () => setIsOpen(true);
 
@@ -43,25 +47,27 @@ const AdminCard = ({
           </span>
           <span
             className={`font-normal text-sidebar sm:text-[12px] md:text-[14px] ${
-              isApproval ? "md:w-96 sm:w-64" : "md:w-80 sm:64"
+              isApproval ? "md:w-96 sm:w-64" : "md:w-80 sm:w-36"
             }`}
           >
             {description}
           </span>
-          <span className="flex flex-row items-center gap-1 text-primary mt-2"> 
-          <FaRegEye/>
-  {console.log(userType)}
-          <Link
-            to={
-              userType === ("Agent"  || "gic" || "visa")
-                ? linkTwo : applicationType ? linkTwo
-                : linkOne
-            }
-            state={{ isprofileView: location.pathname, id: id }}
-            className="font-medium    md:text-[14px] sm:text-[12px]  cursor-pointer"
-          >
-            {pageType === "offerLetter" ? "View Profile" : "View Application"}
-          </Link>
+          <span className="flex flex-row items-center gap-1 text-primary mt-2">
+            <FaRegEye />
+ 
+            <Link
+              to={
+                userType === ("Agent" || "gic" || "visa")
+                  ? linkTwo
+                  : applicationType
+                  ? linkTwo
+                  : linkOne
+              }
+              state={{ isprofileView: location.pathname, id: agentId }}
+              className="font-medium    md:text-[14px] sm:text-[12px]  cursor-pointer"
+            >
+              {pageType === "offerLetter" ? "View Profile" : "View Application"}
+            </Link>
           </span>
         </span>
         <span className="flex flex-col items-start md:w-20 sm:w-24">
@@ -84,8 +90,9 @@ const AdminCard = ({
             <span className="font-semibold text-sidebar mt-2  md:text-[14px] sm:text-[12px]">
               {applicationType === "offerLetter"
                 ? "Offer Letter"
-                : applicationType === "gic"
-                ? "Course Fee Application"
+                : applicationType === "courseFeeApplication"
+                ? "Course Fee " : applicationType === "visa"
+                ? "Visa"
                 : "NA"}
             </span>
           </span>
@@ -116,7 +123,7 @@ const AdminCard = ({
         ) : (
           <span className="flex flex-col items-center w-32  md:text-[14px] sm:text-[12px]">
             <span
-              onClick={() => updateStatus(id, newStatus, sectionData)}
+              onClick={() => updateStatus(id, newStatus, sectionData, "", instituteData, mgdbId)}
               className="bg-primary px-4 py-1 text-white rounded-md cursor-pointer"
             >
               Accept
@@ -154,6 +161,7 @@ const AdminCard = ({
         sectionData={sectionData}
         id={id}
         applicationType={applicationType}
+        instituteData={instituteData}
       />
     </>
   );

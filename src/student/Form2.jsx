@@ -11,8 +11,10 @@ import FormSection from "../components/reusable/FormSection";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { studentAddress } from "../features/studentApi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getStudentData, studentInfo } from "../features/studentSlice";
+import { editStudentAdmin } from "../features/adminApi";
+import { getStudentById } from "../features/adminSlice";
 
 const Form2 = ({
   customClass,
@@ -21,15 +23,24 @@ const Form2 = ({
   studentFormId,
   updateData,
 }) => {
+  const role = localStorage.getItem("role");
+  const dispatch = useDispatch();
+    const location = useLocation();
+  const IdToAddStudent = location?.state?.id?.id;
+  const { getStudentDataById } = useSelector((state) => state.admin);
   const { countryOption } = useSelector((state) => state.general);
   const studentInfoData = useSelector((state) => state.student.studentInfoData);
   const studentData = useSelector((state) => state.student.studentInformation);
   const studentInformation = hide ? studentInfoData : studentData;
-  const residenceAddress = studentInformation?.data?.studentInformation?.residenceAddress;
-  const mailingAddress = studentInformation?.data?.studentInformation?.mailingAddress;
-  const studentId = studentFormId || localStorage.getItem("form");
-  const dispatch = useDispatch();
-  console.log(studentFormId);
+  const residenceAddress =
+    role === "0"
+      ? getStudentDataById?.studentInformation?.residenceAddress
+      : studentInformation?.data?.studentInformation?.residenceAddress;
+  const mailingAddress =
+    role === "0"
+      ? getStudentDataById?.studentInformation?.mailingAddress
+      : studentInformation?.data?.studentInformation?.mailingAddress;
+  const studentId = studentFormId || IdToAddStudent || localStorage.getItem("form") || localStorage.getItem('student')
 
   const formId = studentInformation?.data?.studentInformation?._id;
   const submitId = hide ? formId : studentId;
@@ -145,14 +156,25 @@ const Form2 = ({
     };
 
     try {
-      const res = await studentAddress(payload, studentId, editForm);
-      if (res?.statusCode === 200) {
+      let res;
+      
+
+      if (role === "0") {
+        await editStudentAdmin(`/studentInformation/residence-address-admin/${studentId}`, payload, editForm);
+      } else {
+        res = await studentAddress(payload, studentId, editForm);
+      }
+      if(role === "0"){
+        dispatch(getStudentById(studentId));
+      }
+      toast.success(res?.message || "Data submitted successfully");
+    
+      // if (res?.statusCode === 200) {
         {
           hide === true
             ? updateData()
             : navigate(`/student-form/3`, { state: "passPage" });
-        }
-        toast.success(res?.message || "Data submitted successfully");
+        // }
 
         window.scrollTo(0, 0);
       }

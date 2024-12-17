@@ -13,7 +13,7 @@ export const getStudentData = createAsyncThunk(
   }
 );
 export const studentInfo = createAsyncThunk(
-  "students/studentInfo",
+"students/studentInfo",
   async (id, { rejectWithValue }) => {
     try {
       const response = await getStudentInfo(id);
@@ -29,6 +29,7 @@ export const getApplications = createAsyncThunk(
   async ({search, isType, studentId, page, perPage}, { rejectWithValue }) => {
     try {
       const response = await getApplicationList(search, isType, studentId, page, perPage);
+      
       return response;
     } catch (error) {
       return rejectWithValue(error.response);

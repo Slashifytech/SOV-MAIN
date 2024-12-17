@@ -8,7 +8,15 @@ import { RxSlider } from "react-icons/rx";
 import Form3 from "./../../../student/Form3";
 import { BsFillPassportFill } from "react-icons/bs";
 
-const StudentEdit = ({ data, profileView, updateData, studentId }) => {
+const StudentEdit = ({
+  data,
+  profileView,
+  updateData,
+  studentId,
+  adminPath,
+}) => {
+  // console.log(data, "check")
+
   const [isEditing, setIsEditing] = useState(false);
   const [isResidenceProfile, setIsResidenceProfile] = useState(false);
   const [isPrefenceProfile, setIsPreferenceProfile] = useState(false);
@@ -47,7 +55,8 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
             </span>
           </span>
           {profileView === "/admin/approvals" ||
-          profileView === "/admin/applications-review"
+          profileView === "/admin/applications-review" 
+    
             ? ""
             : !isEditing && (
                 <span
@@ -63,18 +72,21 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
         <div className="flex flex-row w-full justify-between mt-6">
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">Profile Picture</span>
-          {  data?.personalInformation?.profilePicture ?
-            <a
-              className="flex items-center gap-3 text-primary font-medium"
-              href={data?.personalInformation?.profilePicture}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uploaded
-              <span>
-                <FaRegEye />
-              </span>
-            </a> : "NA"}
+            {data?.personalInformation?.profilePicture ? (
+              <a
+                className="flex items-center gap-3 text-primary font-medium"
+                href={data?.personalInformation?.profilePicture}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Uploaded
+                <span>
+                  <FaRegEye />
+                </span>
+              </a>
+            ) : (
+              "NA"
+            )}
             <span className="font-light mt-4">Gender</span>
             <span className="font-medium">
               {data?.personalInformation?.gender || "NA"}
@@ -127,38 +139,35 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light">upload Passport </span>
             {data?.passportDetails?.passportUpload ? (
-  <a
-    className="flex items-center gap-3 text-primary font-medium"
-    href={data.passportDetails.passportUpload}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Uploaded
-    <span>
-      <FaRegEye />
-    </span>
-  </a>
-) : (
-  <span>NA</span>
-)}
+              <a
+                className="flex items-center gap-3 text-primary font-medium"
+                href={data.passportDetails.passportUpload}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Uploaded
+                <span>
+                  <FaRegEye />
+                </span>
+              </a>
+            ) : (
+              <span>NA</span>
+            )}
 
             <span className="font-light mt-4">Passport Number</span>
             <span className="font-medium">
               {data?.passportDetails?.passportNumber || "NA"}
             </span>
-        
           </span>
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Country of Citizenship</span>
             <span className="font-medium">
-              {data?.passportDetails?.countryOfCitizenship 
-               || "NA"}
+              {data?.passportDetails?.countryOfCitizenship || "NA"}
             </span>
             <span className="font-light mt-4">Expiry Date</span>
             <span className="font-medium">
               {data?.passportDetails?.expireDate || "NA"}
             </span>
-          
           </span>
         </div>
         {/* Smooth slide transition for editable section */}
@@ -174,7 +183,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
               <Form1
                 hide={true}
                 handleCancel={handleCancelProfileInfo}
-                studentFormId={data._id}
+                studentFormId={data?._id}
                 updateData={updateData}
               />
             </div>
@@ -192,7 +201,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
             <span className="font-semibold text-[22px]">Residence Address</span>
           </span>
           {profileView === "/admin/approvals" ||
-          profileView === "/admin/applications-review"
+          profileView === "/admin/applications-review" 
             ? ""
             : !isResidenceProfile && (
                 <span
@@ -244,7 +253,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
               <Form2
                 hide={true}
                 handleCancel={handleCancelResidence}
-                studentFormId={data._id}
+                studentFormId={data?._id}
                 updateData={updateData}
               />
             </div>
@@ -262,7 +271,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
             <span className="font-semibold text-[22px]">Preferences</span>
           </span>
           {profileView === "/admin/approvals" ||
-          profileView === "/admin/applications-review"
+          profileView === "/admin/applications-review" 
             ? ""
             : !isPrefenceProfile && (
                 <span
@@ -316,7 +325,7 @@ const StudentEdit = ({ data, profileView, updateData, studentId }) => {
               <Form3
                 hide={true}
                 handleCancel={handleCancelPreference}
-                studentFormId={data._id}
+                studentFormId={data?._id}
                 updateData={updateData}
               />
             </div>

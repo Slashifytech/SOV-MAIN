@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import Loader from "../components/Loader";
 
 const ProtectedStudent = ({ children }) => {
   const roleType = localStorage.getItem("role");
-  const { studentInfoData } = useSelector((state) => state.student);
+  const authToken = localStorage.getItem("userAuthToken");
+
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -18,16 +18,15 @@ const ProtectedStudent = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center md:ml-32 sm:ml-20 md:mt-48 mt-60 sm:mt-80">
+      <div className="flex justify-center md:ml-9 sm:ml-20 md:mt-48 mt-60 sm:mt-80">
         <Loader />
       </div>
     );
   }
-  if (
-    roleType !== "3" &&
-    studentInfoData?.data?.studentInformation?.pageStatus?.status !==
-      "completed"
-  ) {
+
+  const isAuthorizedRole = roleType === "3";
+
+  if (!isAuthorizedRole || !authToken) {
     return <Navigate to="/login" replace={true} />;
   }
 

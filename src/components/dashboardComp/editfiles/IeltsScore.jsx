@@ -101,11 +101,11 @@ const IeltsScore = ({ appId, updatedData, profileViewPath}) => {
     if (applicationDataById) {
       setOfferLater({
         IELTS: {
-          reading: applicationDataById?.ieltsScore?.reading || "",
-          speaking: applicationDataById?.ieltsScore?.speaking || "",
-          writing: applicationDataById?.ieltsScore?.writing || "",
-          listening: applicationDataById?.ieltsScore?.listening || "",
-          overallBand: applicationDataById?.ieltsScore?.overallBand || "",
+          reading: applicationDataById?.offerLetter?.ieltsScore?.reading || "",
+          speaking: applicationDataById?.offerLetter?.ieltsScore?.speaking || "",
+          writing: applicationDataById?.offerLetter?.ieltsScore?.writing || "",
+          listening: applicationDataById?.offerLetter?.ieltsScore?.listening || "",
+          overallBand: applicationDataById?.offerLetter?.ieltsScore?.overallBand || "",
         },
       });
     }
@@ -163,7 +163,7 @@ const IeltsScore = ({ appId, updatedData, profileViewPath}) => {
             </span>
             <span className="font-semibold text-[22px]">IELTS Score</span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath 
             ? ""
             : !isOne && (
                 <span
@@ -180,26 +180,26 @@ const IeltsScore = ({ appId, updatedData, profileViewPath}) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Reading</span>
             <span className="font-medium">
-              {applicationDataById?.ieltsScore?.reading || "NA"}
+              {applicationDataById?.offerLetter?.ieltsScore?.reading || "NA"}
             </span>
             <span className="font-light mt-4">Writing</span>
             <span className="font-medium">
-              {applicationDataById?.ieltsScore?.writing || "NA"}
+              {applicationDataById?.offerLetter?.ieltsScore?.writing || "NA"}
             </span>
             <span className="font-light mt-4">Overall Bands</span>
             <span className="font-medium">
-              {applicationDataById?.ieltsScore?.overallBand || "NA"}
+              {applicationDataById?.offerLetter?.ieltsScore?.overallBand || "NA"}
             </span>
           </span>
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Speaking</span>
             <span className="font-medium">
-              {applicationDataById?.ieltsScore?.speaking || "NA"}
+              {applicationDataById?.offerLetter?.ieltsScore?.speaking || "NA"}
             </span>
 
             <span className="font-light mt-4">Listening</span>
             <span className="font-medium">
-              {applicationDataById?.ieltsScore?.listening || "NA"}
+              {applicationDataById?.offerLetter?.ieltsScore?.listening || "NA"}
             </span>
           </span>
         </div>
@@ -232,7 +232,7 @@ const IeltsScore = ({ appId, updatedData, profileViewPath}) => {
                   className="bg-primary text-white px-6 py-2 rounded"
                   onClick={handleSubmit}
                 >
-                  Save
+                  Submit
                 </button>
               </div>
             </>

@@ -10,26 +10,45 @@ import { FaRegEye } from "react-icons/fa";
 import { studentById } from "./../features/generalSlice";
 import { CustomInput, SelectComponent } from "../components/reusable/Input";
 import { IoSearchOutline } from "react-icons/io5";
-import { applicationTypeOption, statusOption } from "../constant/data";
+import { applicationTypeOption, statusApplicationView, statusOption } from "../constant/data";
 import Pagination from "../components/dashboardComp/Pagination";
 import Loader from "../components/Loader";
 import Dnf from "../components/Dnf";
+import ApplicationChoosePop from "../components/dashboardComp/ApplicationChoosePop";
 
-const ApplicationView = () => {
+const ApplicationView = ({stId, adminPath, adminAccess}) => {
+  const role = localStorage.getItem("role");
   const location = useLocation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isType, setIsType] = useState("");
   const { studentApplicationData } = useSelector((state) => state.agent);
   const { studentData } = useSelector((state) => state.general);
-  const studentId = location.state;
+  const studentId = 
+  location.pathname === "/student-profile" 
+    ? stId || (adminPath && adminAccess) || location?.state?.notifyId
+    : location?.state?.notify === "notify" ? location?.state?.notifyId : location.state ||  location?.state?.notifyId
+console.log(location)
   const [isLoading, setIsLoading] = useState(true);
   const [perPage, setPerPage] = useState(10);
-  const totalUsersCount = studentApplicationData?.total || 0;
-  const currentPage = studentApplicationData?.page || 1;
+  const totalUsersCount = studentApplicationData?.totalApplications || 0;
+  const currentPage = studentApplicationData?.currentPage || 1;
   const totalPagesCount = studentApplicationData?.totalPages || 1;
   const dispatch = useDispatch();
   const [applicationIds, setApplicationIds] = useState([]);
+  const [isOpenOpt, setIsOpenOpt] = useState(false);
+  // const availableApplications =  studentApplicationData?.applications?.filter(
+
+  // )
+
+  const closeOpt = () => {
+    setIsOpenOpt(false); // Close the popup
+  };
+
+  const handleOpenOpt = () => {
+    setIsOpenOpt(true); // Open the popup
+  };
+
   const handlePerPageChange = (e) => {
     setPerPage(parseInt(e.target.value));
     setPage(1);
@@ -61,7 +80,7 @@ const ApplicationView = () => {
   const TABLE_HEAD = [
     "S.No.",
     "Application ID",
-    "Institute",
+    // "Institute", 
     "Country",
     "Type",
     "Status",
@@ -71,12 +90,12 @@ const ApplicationView = () => {
   // Prepare table data
   const TABLE_ROWS = studentApplicationData?.applications?.map(
     (data, index) => ({
-      SNO: (currentPage - 1) * perPage + index + 1,
+      sno: (currentPage - 1) * perPage + index + 1,
       id: data?.applicationId || "NA",
-      institute: data?.offerLetter?.preferences?.institution || "NA",
-      country: data?.offerLetter?.preferences?.country || "NA",
-      type: data?.offerLetter?.type || "NA",
-      status: data?.offerLetter?.status || "NA",
+      institute: data?.preferences?.institution || "NA",
+      country: data?.preferences?.country || "NA",
+      type: data || "NA",
+      status: data?.status || "NA",
       appId: data?._id,
     })
   );
@@ -96,85 +115,91 @@ const ApplicationView = () => {
   }, []);
   return (
     <>
-      <Header customLink="/agent/shortlist" />
+      {location.pathname === "/student-profile" ? (
+        ""
+      ) : (
+        <>
+          <Header customLink="/agent/shortlist" />
 
-      <span className="fixed overflow-y-scroll scrollbar-hide  bg-white">
-        <AgentSidebar />
-      </span>
+          <span className="fixed overflow-y-scroll scrollbar-hide  bg-white">
+            <AgentSidebar />
+          </span>
+        </>
+      )}
 
       <div>
-        <span className="flex items-center pt-20 pb-6 md:pl-[18.5%] sm:pl-[27%] bg-white">
-          <span>
-            <div className="flex items-center gap-4 mt-1 ">
-              <img
-                src={
-                  studentData?.studentInformation?.personalInformation
-                    ?.profilePicture || profileSkeleton
-                }
-                alt="Profile"
-                className="rounded-md w-28 h-28"
-                onError={profileSkeleton}
-                loading="lazy"
-              />
-              <span className="flex flex-col">
-                <span className="text-primary font-medium text-[13px]">
-                  {totalUsersCount || "NA"} Applications
-                </span>
-                <span className="text-sidebar text-[18px] font-medium ">
-                  {studentData?.studentInformation?.personalInformation
-                    ?.firstName +
-                    " " +
-                    studentData?.studentInformation?.personalInformation
-                      ?.lastName || "NA"}
-                </span>
-                <span className="text-[14px] pt-[1px] text-body font-normal">
-                  {studentData?.studentInformation?.personalInformation
-                    ?.email || "NA"}
-                </span>
-                <span className="text-[14px] text-body font-normal">
-                  {studentData?.studentInformation?.personalInformation?.phone
-                    ?.phone || "NA"}
-                </span>
-                <span className="text-[14px] text-body font-normal">
-                  ID: {studentData?.studentInformation?.stId || "NA"}
-                </span>
+        {location.pathname === "/student-profile" ? (
+          ""
+        ) : (
+          <>
+            <span className="flex items-center pt-20 pb-6 md:pl-[18.5%] sm:pl-[27%] bg-white">
+              <span>
+                <div className="flex items-center gap-4 mt-1 ">
+                  <img
+                    src={
+                      studentData?.studentInformation?.personalInformation
+                        ?.profilePicture || profileSkeleton
+                    }
+                    alt="Profile"
+                    className="rounded-md w-28 h-28"
+                    onError={profileSkeleton}
+                    loading="lazy"
+                  />
+                  <span className="flex flex-col">
+                    <span className="text-primary font-medium text-[13px]">
+                      {totalUsersCount || "0"} Applications
+                    </span>
+                    <span className="text-sidebar text-[18px] font-medium ">
+                      {studentData?.studentInformation?.personalInformation
+                        ?.firstName +
+                        " " +
+                        studentData?.studentInformation?.personalInformation
+                          ?.lastName || "NA"}
+                    </span>
+                    <span className="text-[14px] pt-[1px] text-body font-normal">
+                      {studentData?.studentInformation?.personalInformation
+                        ?.email || "NA"}
+                    </span>
+                    <span className="text-[14px] text-body font-normal">
+                      {studentData?.studentInformation?.personalInformation
+                        ?.phone?.phone || "NA"}
+                    </span>
+                    <span className="text-[14px] text-body font-normal">
+                      ID: {studentData?.studentInformation?.stId || "NA"}
+                    </span>
+                  </span>
+                </div>
               </span>
-            </div>
-          </span>
-        </span>
-        <div className="md:ml-[19.5%] sm:ml-[27%] mt-6 mr-6">
+            </span>
+          </>
+        )}
+        <div
+          className={`mt-6 mr-6 ${
+            location.pathname === "/student-profile"
+              ? "ml-6"
+              : "md:ml-[18.5%]  sm:ml-[25%]"
+          }`}
+        >
           <span className="flex flex-row items-center mb-3">
             <span className="flex flex-row justify-between w-full items-center">
               <span className="flex flex-row items-center ">
                 {" "}
-                <span className="text-body">Show</span>
+            
                 <select
-                  className="ml-3 border px-2 py-1 w-10 h-11 rounded outline-none"
-                  value={perPage}
-                  onChange={handlePerPageChange}
-                >
-                  {perPageOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <span className="px-3 text-body">entries</span>
-                <select
-                  className="ml-3 border px-2 py-1 w-40 h-11 rounded outline-none"
+                  className="ml-3 border px-2 py-1 md:w-40 sm:w-20 h-11 rounded outline-none"
                   value={isType}
                   onChange={handleApplicatioTypeChange}
                 >
                   <option value="">Status</option>
-                  {statusOption.map((option) => (
+                  {statusApplicationView.map((option) => (
                     <option key={option.option} value={option.option}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-                <span className="flex flex-row items-center  ml-9">
+                <span className="flex flex-row items-center  md:ml-9 sm:ml-3">
                   <CustomInput
-                    className="h-11 w-80 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
+                    className="h-11 md:w-80 sm:w-60 rounded-md text-body placeholder:px-3 pl-7 border border-[#E8E8E8] outline-none"
                     type="text"
                     placeHodler="Search by application ID"
                     name="search"
@@ -186,36 +211,42 @@ const ApplicationView = () => {
                   </span>
                 </span>
               </span>
+              {!adminPath && 
               <Link
-                to="/offerletter-apply"
-                state={studentData?.studentInformation?._id}
-                className="bg-primary text-white px-4  rounded-md py-2"
+                onClick={handleOpenOpt}
+                className="bg-primary text-white md:px-4 sm:px-2  rounded-md py-2"
               >
                 + Add Application
-              </Link>
+              </Link>}
             </span>
           </span>
         </div>
       </div>
       {isLoading ? (
-        <div className="w-1 ml-[53%] mt-12">
+        <div className={`w-full  mt-12 ${
+            location.pathname === "/student-profile" ? "ml-[45%]" : "ml-[53%]"
+          }`}>
           <Loader />
         </div>
       ) : studentApplicationData?.applications &&
         studentApplicationData?.applications?.length > 0 ? (
         <>
-          <div className="md:ml-[19.5%] sm:ml-[27%]  mt-6 mr-6">
+          <div className={`  mt-6 mr-6 ${
+            location.pathname === "/student-profile" ? "ml-6" : "sm:ml-[26.5%] md:ml-[19%]"
+          }`}>
             <CustomTableTwo
               tableHead={TABLE_HEAD}
               tableRows={TABLE_ROWS}
               SecondLink="/offerLetter-apply"
-              action={"Edit/View"}
+              action={  role === "0" ? "View": "Edit/View"}
               icon={<FaRegEye />}
-              link="/offerLetter/edit"
-              customLinkState={TABLE_ROWS?.map((data) => data?.appId)}
+              // link="/offerLetter/edit"
+              customLinkState={TABLE_ROWS?.map((data) => data?._id)}
             />
           </div>
-          <div className="mt-16 mb-10 ml-20">
+          <div className={`mt-16 mb-10  ${
+            location.pathname === "/student-profile" ? "-ml-20" : "ml-20"
+          }`}>
             <Pagination
               currentPage={currentPage}
               hasNextPage={currentPage * perPage < totalUsersCount}
@@ -226,7 +257,11 @@ const ApplicationView = () => {
           </div>
         </>
       ) : (
-        <div className="mt-8 font-medium text-body ml-[25%] mr-[15%]">
+        <div
+          className={`mt-8 font-medium text-body  mr-[15%] ${
+            location.pathname === "/student-profile" ? "ml-6" : "ml-[25%]"
+          }`}
+        >
           <Dnf
             dnfImg={dnf}
             headingText="Start Your Journey!"
@@ -234,6 +269,12 @@ const ApplicationView = () => {
           />
         </div>
       )}
+
+      <ApplicationChoosePop
+        isOpenOpt={isOpenOpt}
+        closeOpt={closeOpt}
+        state={studentData?.studentInformation?._id}
+      />
     </>
   );
 };

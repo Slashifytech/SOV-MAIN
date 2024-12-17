@@ -7,13 +7,17 @@ import {
   InstituteComponent,
   SelectComponent,
 } from "../components/reusable/Input";
-import { studentPreference } from "../features/studentApi";
+import { studentAddress, studentPreference } from "../features/studentApi";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { getInstituteOption } from "../features/generalSlice";
 import { getStudentData, studentInfo } from "../features/studentSlice";
 import PopUp from "../components/reusable/PopUp";
 import { check } from "../assets";
+import socketServiceInstance from "../services/socket";
+import { editStudentAdmin } from "../features/adminApi";
+import { getStudentById } from "../features/adminSlice";
+import { useLocation } from "react-router-dom";
 
 const Form3 = ({
   customClass,
@@ -22,20 +26,23 @@ const Form3 = ({
   studentFormId,
   updateData,
 }) => {
+  const role = localStorage.getItem("role");
+  const location = useLocation();
+  const { getStudentDataById } = useSelector((state) => state.admin);
   const { prefCountryOption } = useSelector((state) => state.general);
   const { courses } = useSelector((state) => state.general);
+  const IdToAddStudent = location?.state?.id?.id;
   const { instituteOption } = useSelector((state) => state.general);
   const studentInfoData = useSelector((state) => state.student.studentInfoData);
   const studentData = useSelector((state) => state.student.studentInformation);
   const studentInformation = hide ? studentInfoData : studentData;
   const dispatch = useDispatch();
   const formId = studentInformation?.data?.studentInformation?._id;
-  const preference = studentInformation?.data?.studentInformation?.preferences;
-  const studentId = localStorage.getItem("form") || studentFormId
+  const preference = role === "0" ? getStudentDataById?.studentInformation?.preferences : studentInformation?.data?.studentInformation?.preferences;
+  const studentId = localStorage.getItem("form") || studentFormId || IdToAddStudent
   const [isPopUp, setIsPopUp] = useState(false);
   const editForm = hide === true ? "edit" : null;
   const submitId = hide ? formId : studentId;
-  const role = localStorage.getItem('role')
   const [preferenceData, setPreferenceData] = useState({
     preferredCountry: "",
     preferredState: "",
@@ -116,17 +123,48 @@ const Form3 = ({
     if (validateFields()) {
       setLoading(true);
       try {
-        const res = await studentPreference(preferenceData, studentId, editForm);
+        let res;
+      
+
+        if (role === "0") {
+          await editStudentAdmin(`/studentInformation/preference-admin/${studentId}`, preferenceData, editForm);
+        } else {
+          res = await studentPreference(preferenceData, studentId, editForm);
+        }
+        if(role === "0"){
+          dispatch(getStudentById(studentId));
+        }
+
         toast.success(
           res?.message || "Personal Information Submitted successfully"
         );
-
+  // console.log(res);
         {
           hide === true ? updateData() : PopUpOpen();
         }
         localStorage.removeItem("form");
-
-        console.log(res);
+        if (role === "3" ) {
+          if (socketServiceInstance.isConnected()) {
+            //from agent to admin
+            const notificationData = {
+              title: " STUDENT_REGISTERED_FOR_APPROVAL",
+              message: `${studentInfoData?.data?.studentInformation?.personalInformation?.firstName} ${studentInfoData?.data?.studentInformation?.personalInformation?.lastName}  ${studentInfoData?.data?.studentInformation?.stId} Student registered for approval.
+  `,
+              path:"/admin/approvals",
+              recieverId: "",
+            };
+    
+            socketServiceInstance.socket.emit(
+              "NOTIFICATION_AGENT_TO_ADMIN",
+              notificationData
+            );
+          } else {
+            console.error("Socket connection failed, cannot emit notification.");
+          }
+        }
+     
+  
+        // console.log(res);
       } catch (error) {
         console.error(error);
         toast.error(error.message || "Something went wrong");

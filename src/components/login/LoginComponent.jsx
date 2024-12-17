@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUserData } from "../../features/authSlice";
-import { getStudentData } from "../../features/studentSlice";
+import { getStudentData, studentInfo } from "../../features/studentSlice";
 import { getPersonalInfo } from "../../features/studentApi";
 import { getAgentData } from "../../features/agentApi";
 import { agentInformation } from "../../features/agentSlice";
@@ -75,7 +75,7 @@ const LoginComponent = () => {
             role: loginData.role,
           })
         ).unwrap();
-        toast.success(res?.message || "Login Successful");
+        // toast.success(res?.message || "Login Successful");
 
         if (loginData?.role === "2") {
           const agentInfo = await getAgentData().catch((error) => {
@@ -84,23 +84,40 @@ const LoginComponent = () => {
             return;
           });
           dispatch(agentInformation());
+      
           let redirectPath = "";
-          if (
+          if(agentInfo.pageStatus?.status === "requestedForReapproval") {
+            redirectPath = `/agent/account-deleted`;
+          } else if(agentInfo.deleted === true) {
+            redirectPath = `/agent/account-deleted`;
+          } else if (
             agentInfo.pageCount === 6 &&
             agentInfo.pageStatus?.status === "completed"
           ) {
             redirectPath = `/agent/dashboard`;
           } else if (
             (agentInfo.pageCount === 6 &&
-            agentInfo.pageStatus.status === "notapproved") ||  (agentInfo.pageStatus.status === "notapproved")
+              agentInfo.pageStatus.status === "notapproved") ||
+            (agentInfo.pageCount === 6 &&
+           
+              agentInfo.deleted === true) ||
+            agentInfo.pageStatus.status === "notapproved"
           ) {
             redirectPath = `/waiting`;
-          }else if (
+          } else if (
             (agentInfo.pageCount === 6 &&
-            agentInfo.pageStatus.status === "rejected") ||  (agentInfo.pageStatus.status === "rejected")
+              agentInfo.pageStatus.status === "rejected") ||
+            agentInfo.pageStatus.status === "rejected"
           ) {
             redirectPath = "/agent-form/1";
-          }  else if (
+          } else if (
+            (agentInfo.pageCount === 6 &&
+              agentInfo.pageStatus.status === "requestedForReapproval") ||
+            agentInfo.pageStatus.status === "requestedForReapproval"
+          ) {
+            redirectPath = "/agent/account-deleted";
+          } 
+          else if (
             agentInfo.pageCount !== 6 &&
             agentInfo.pageStatus?.status === "registering"
           ) {
@@ -114,47 +131,62 @@ const LoginComponent = () => {
           }
         } else if (loginData?.role === "3" && res.user._id !== "") {
           dispatch(getStudentData(res.user._id));
+          dispatch(studentInfo(res.user._id));
 
-          const studentInfo = await getPersonalInfo(res.user._id).catch(
+
+          const studentInfoData = await getPersonalInfo(res.user._id).catch(
             (error) => {
               console.log(error);
               navigate("/student-form/1", { state: "passPage" });
               return;
             }
-          );  
-          console.log(studentInfo)
+          );
+          // console.log(studentInfoData);
 
-        
-          if (!studentInfo.data || Object.keys(studentInfo.data).length === 0) {
+          if (!studentInfoData.data || Object.keys(studentInfoData.data).length === 0) {
             navigate("student-form/1", { state: "passPage" });
             return;
           }
           let redirectPath = "";
 
-          if (
-            studentInfo?.data?.studentInformation?.pageCount === 3 &&
-            studentInfo?.data?.studentInformation?.pageStatus?.status === "completed"
+          if(studentInfoData.data.studentInformation.pageStatus?.status === "requestedForReapproval") {
+            redirectPath = `/student/account-deleted`;
+          } else if(studentInfoData.data.studentInformation.deleted === true) {
+            redirectPath = `/student/account-deleted`;
+          } else if (
+            studentInfoData?.data?.studentInformation?.pageCount === 3 &&
+            studentInfoData?.data?.studentInformation?.pageStatus?.status ===
+              "completed"
           ) {
             redirectPath = `/student/dashboard`;
-          } 
+          }
           if (
-            studentInfo?.data?.studentInformation?.pageCount === 3 &&
-            studentInfo?.data?.studentInformation?.pageStatus?.status === "notapproved"
+            studentInfoData?.data?.studentInformation?.pageCount === 3 &&
+            studentInfoData?.data?.studentInformation?.pageStatus?.status ===
+              "notapproved"
           ) {
             redirectPath = `/waiting`;
           } else if (
-            studentInfo?.data?.studentInformation?.pageCount !== 3 &&
-            studentInfo?.data?.studentInformation?.pageStatus?.status === "registering"
+            studentInfoData?.data?.studentInformation?.pageCount !== 3 &&
+            studentInfoData?.data?.studentInformation?.pageStatus?.status ===
+              "registering"
           ) {
-            redirectPath = `/student-form/${studentInfo?.data?.studentInformation?.pageCount}`;}
-            if (
-              studentInfo?.data?.studentInformation?.pageCount === 3 &&
-              studentInfo?.data?.studentInformation?.pageStatus?.status === "rejected"
-            ) {
-              redirectPath = `/student-form/1`;}
-            
-        
-
+            redirectPath = `/student-form/1`;
+          }
+          if (
+            studentInfoData?.data?.studentInformation?.pageCount === 3 &&
+            studentInfoData?.data?.studentInformation?.pageStatus?.status ===
+              "rejected"
+          ) {
+            redirectPath = `/student-form/1`;
+          }
+          if (
+            studentInfoData?.data?.studentInformation?.pageCount === 3 &&
+            studentInfoData?.data?.studentInformation?.pageStatus?.status ===
+              "requestedForReapproval"
+          ) {
+            redirectPath = `/student/account-deleted`;
+          }
           if (redirectPath) {
             navigate(redirectPath, { state: "passPage" });
           }
@@ -170,7 +202,13 @@ const LoginComponent = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin(e);
+    }
+  };
   return (
+    <div onKeyDown={handleKeyDown} className="login-container">
     <span className="font-poppins">
       <div className="flex justify-center space-x-6 my-4">
         <button
@@ -260,7 +298,7 @@ const LoginComponent = () => {
           </Link>
         </p>
       </div>
-    </span>
+    </span></div>
   );
 };
 

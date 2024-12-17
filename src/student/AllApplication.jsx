@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/dashboardComp/Header";
-import { CustomTableThree } from "../components/Table";
+import { CustomTableThree, CustomTableTwo } from "../components/Table";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { dnf, profileSkeleton } from "../assets";
@@ -14,6 +14,7 @@ import Loader from "../components/Loader";
 import Dnf from "../components/Dnf";
 import Sidebar from "../components/dashboardComp/Sidebar";
 import { clearApplicationData, getApplications } from "../features/studentSlice";
+import ApplicationChoosePop from "../components/dashboardComp/ApplicationChoosePop";
 
 const AllApplication = () => {
   const [search, setSearch] = useState("");
@@ -22,6 +23,7 @@ const AllApplication = () => {
   const { studentInfoData, applicationData } = useSelector(
     (state) => state.student
   );
+  const [isOpenOpt, setIsOpenOpt] = useState(false);
   const studentId = studentInfoData?.data?.studentInformation?._id;
   const [isLoading, setIsLoading] = useState(true);
   const [perPage, setPerPage] = useState(10);
@@ -29,7 +31,13 @@ const AllApplication = () => {
   const currentPage = applicationData?.pagination?.currentPage || 1;
   const totalPagesCount = applicationData?.pagination?.totalPages || 1;
   const dispatch = useDispatch();
+  const closeOpt = () => {
+    setIsOpenOpt(false); 
+  };
 
+  const handleOpenOpt = () => {
+    setIsOpenOpt(true); 
+  };
   const handlePerPageChange = (e) => {
     setPerPage(parseInt(e.target.value));
     setPage(1);
@@ -64,11 +72,12 @@ const AllApplication = () => {
     perPageOptions.push(i);
   }
 
-  const TABLE_HEAD = ["S.No.", "Application ID", "Type", "Status", "Action"];
+  const TABLE_HEAD = ["S.No.", "Application ID","Country" ,"Type", "Status", "Action"];
+  
   const TABLE_ROWS = applicationData?.data?.map((data, index) => ({
-    SNO: (currentPage - 1) * perPage + index + 1,
+    sno: (currentPage - 1) * perPage + index + 1,
     id: data?.applicationId || "NA",
-    type: data?.type || "NA",
+    type: data || "NA",
     status: data?.status || "NA",
     appId: data?._id,
   }));
@@ -81,7 +90,7 @@ const AllApplication = () => {
       </span>
 
       {isLoading ? (
-        <div className="w-1 ml-[53%] mt-44">
+        <div className=" ml-[53%] md:mt-80 sm:mt-80 ">
           <Loader />
         </div>
       ) : (
@@ -132,7 +141,7 @@ const AllApplication = () => {
               <span className="flex flex-row items-center mb-3">
                 <span className="flex flex-row justify-between w-full items-center">
                   <span className="flex flex-row items-center ">
-                    <span className="text-body">Show</span>
+                    {/* <span className="text-body">Show</span>
                     <select
                       className="ml-3 border px-2 py-1 w-10 h-11 rounded outline-none"
                       value={perPage}
@@ -144,7 +153,7 @@ const AllApplication = () => {
                         </option>
                       ))}
                     </select>
-                    <span className="md:px-3 sm:px-1 text-body">entries</span>
+                    <span className="md:px-3 sm:px-1 text-body">entries</span> */}
                     <select
                       className="ml-3 border px-2 py-1 md:w-40 sm:w-24 h-11 rounded outline-none"
                       value={isType}
@@ -171,27 +180,26 @@ const AllApplication = () => {
                       </span>
                     </span>
                   </span>
-                  <Link
-                    to="/offerletter-apply"
-                    state={studentInfoData?.data?.studentInformation?._id}
-                    className="bg-primary text-white md:px-4 sm:px-2 rounded-md py-2"
+                  <span
+                    onClick={handleOpenOpt}
+                    className="bg-primary text-white md:px-4 sm:px-2 rounded-md py-2 cursor-pointer"
                   >
                     + Add Application
-                  </Link>
+                  </span>
                 </span>
               </span>
             </div>
 
             {totalUsersCount > 0 ? (
               <>
-                <div className="md:ml-[19.5%] sm:ml-[27%] mt-6">
-                  <CustomTableThree
+                <div className="md:ml-[19.5%] sm:ml-[27%] mt-6 md:w-[85%]  ">
+                  <CustomTableTwo
                     tableHead={TABLE_HEAD}
                     tableRows={TABLE_ROWS}
                     SecondLink="/offerLetter-apply"
                     action={"Edit/View"}
                     icon={<FaRegEye />}
-                    link="/offerLetter/edit"
+                    // link="/offerLetter/edit"
                     customLinkState={TABLE_ROWS?.map((data) => data?._id)}
                   />
                 </div>
@@ -215,6 +223,12 @@ const AllApplication = () => {
               </div>
             )}
           </div>
+          
+      <ApplicationChoosePop
+        isOpenOpt={isOpenOpt}
+        closeOpt={closeOpt}
+        state={studentId}
+      />
         </>
       )}
     </>

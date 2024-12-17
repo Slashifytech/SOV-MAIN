@@ -106,11 +106,11 @@ const TOEFLScore = ({ appId, updatedData, profileViewPath }) => {
     if (applicationDataById) {
       setOfferLater({
         TOEFL: {
-          reading: applicationDataById?.toefl?.reading || "",
-          speaking: applicationDataById?.toefl?.speaking || "",
-          writing: applicationDataById?.toefl?.writing || "",
-          listening: applicationDataById?.toefl?.listening || "",
-          overallBand: applicationDataById?.toefl?.overallBand || "",
+          reading: applicationDataById?.offerLetter?.toefl?.reading || "",
+          speaking: applicationDataById?.offerLetter?.toefl?.speaking || "",
+          writing: applicationDataById?.offerLetter?.toefl?.writing || "",
+          listening: applicationDataById?.offerLetter?.toefl?.listening || "",
+          overallBand: applicationDataById?.offerLetter?.toefl?.overallBand || "",
         },
       });
     } else {
@@ -176,7 +176,7 @@ const TOEFLScore = ({ appId, updatedData, profileViewPath }) => {
             </span>
             <span className="font-semibold text-[22px]">TOEFL Score</span>
           </span>
-          {profileViewPath === "/admin/applications-review"
+          {profileViewPath 
             ? ""
             : !isOne && (
                 <span
@@ -193,26 +193,26 @@ const TOEFLScore = ({ appId, updatedData, profileViewPath }) => {
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Reading</span>
             <span className="font-medium">
-              {applicationDataById?.toefl?.reading || "NA"}
+              {applicationDataById?.offerLetter?.toefl?.reading || "NA"}
             </span>
             <span className="font-light mt-4">Writing</span>
             <span className="font-medium">
-              {applicationDataById?.toefl?.writing || "NA"}
+              {applicationDataById?.offerLetter?.toefl?.writing || "NA"}
             </span>
             <span className="font-light mt-4">Overall Bands</span>
             <span className="font-medium">
-              {applicationDataById?.toefl?.overallBand || "NA"}
+              {applicationDataById?.offerLetter?.toefl?.overallBand || "NA"}
             </span>
           </span>
           <span className="w-1/2 flex flex-col text-[15px]">
             <span className="font-light mt-4">Speaking</span>
             <span className="font-medium">
-              {applicationDataById?.toefl?.speaking || "NA"}
+              {applicationDataById?.offerLetter?.toefl?.speaking || "NA"}
             </span>
 
             <span className="font-light mt-4">Listening</span>
             <span className="font-medium">
-              {applicationDataById?.toefl?.listening || "NA"}
+              {applicationDataById?.offerLetter?.toefl?.listening || "NA"}
             </span>
           </span>
         </div>
@@ -244,7 +244,7 @@ const TOEFLScore = ({ appId, updatedData, profileViewPath }) => {
                   className="bg-primary text-white px-6 py-2 rounded"
                   onClick={handleSubmit}
                 >
-                  Save
+                  Submit
                 </button>
               </div>
             </>

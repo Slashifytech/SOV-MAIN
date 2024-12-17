@@ -152,12 +152,14 @@ export const resendAgentOtp = async (email) => {
 
 
 export const verifyAgentEmail = async(email, otp, password) =>{
+  console.log(password)
   try{
   const res = apiurl.post('/auth/verify-agent',{
    email: email,
    otp: otp,
+   password: password,
    type: "2",
-   password:password
+ 
   })
   return res
   }catch(error){
