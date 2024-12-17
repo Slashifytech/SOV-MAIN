@@ -43,7 +43,7 @@ function App() {
         }
 
         await socketServiceInstance.connectToSocket(
-          import.meta.env.VITE_APP_DEV_BASE,
+          "https://sovserver.sovportal.in",
           data
         );
       } catch (error) {
