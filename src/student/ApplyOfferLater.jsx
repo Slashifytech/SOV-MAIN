@@ -154,7 +154,7 @@ const ApplyOfferLater = () => {
   const [selectedEducation, setSelectedEducation] = useState("");
   const [errors, setErrors] = useState({});
   const [resetDoc, setResetDoc] = useState(false);
-  const [resetSecondDoc, setResetSecondDoc] = useState(false);
+  // const [resetSecondDoc, setResetSecondDoc] = useState(false);
   const [newFiles, setNewFiles] = useState([]);
   const [deletedFiles, setDeletedFiles] = useState([]);
   useEffect(() => {
@@ -360,7 +360,7 @@ const ApplyOfferLater = () => {
         }),
       }));
 
-      toast.info(`${fileOrUrl.name} will be uploaded upon saving.`);
+      // toast.info(`${fileOrUrl.name} will be uploaded upon saving.`);
     } else if (typeof fileOrUrl === "string") {
       // Handle URL strings
       setOfferLater((prevState) => ({

@@ -74,7 +74,7 @@ const {getAdminProfile} = useSelector((state)=>state.admin)
       profilePicture: "",
     }));
 setResetProfilePic(true)
-    toast.info("File has been marked for deletion.");
+    // toast.info("File has been marked for deletion.");
   };
 
   const handleInput = (e) => {
