@@ -175,7 +175,7 @@ export function CustomTableTwo({
     const uniqueFileName = `${uuidv4()}-${file.name}`;
     const storageRef = ref(
       storage,
-      `uploads/adminApplications/${uniqueFileName}`
+      `uploads/adminApplications/test${uniqueFileName}`
     );
 
     try {
@@ -280,13 +280,13 @@ export function CustomTableTwo({
       toast.error("Error deleting file. Please try again.");
     }
   };
-  useEffect(() => {
-    customDataThree?.forEach((item) => {
-      dispatch(adminUrlData(item)); // Dispatch each item individually
-    });
-  }, [dispatch]);
+  // useEffect(() => {
+  //   customDataThree?.forEach((item) => {
+  //     dispatch(adminUrlData(item)); 
+  //   });
+  // }, [dispatch]);
 
-  console.log(customDataThree, "test");
+  // console.log(customDataThree, "test");
 
   return (
     <Card className="h-full w-full overflow-scroll scrollbar-hide font-poppins">
